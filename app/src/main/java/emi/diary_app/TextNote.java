@@ -1,4 +1,4 @@
-package emi.note_app;
+package emi.diary_app;
 
 public class TextNote extends Note{
 
@@ -29,7 +29,7 @@ public class TextNote extends Note{
     }
 
 
-    public String getText_note() {
+    public String getNote() {
 
         return this.text_note;
     }

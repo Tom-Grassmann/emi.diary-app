@@ -1,5 +1,5 @@
-package emi.note_app;
+package emi.diary_app;
 
 public enum NoteType {
-    TEXT, VOICE
+    TEXT, VOICE, PICTURE;
 }

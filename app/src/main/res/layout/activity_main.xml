@@ -6,20 +6,74 @@
     android:layout_height="match_parent" android:fitsSystemWindows="true"
     tools:context="emi.diary_app.MainActivity">
 
-    <android.support.design.widget.AppBarLayout android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:theme="@style/AppTheme.AppBarOverlay">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
-            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary" app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-    </android.support.design.widget.AppBarLayout>
+        <android.support.design.widget.AppBarLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:theme="@style/AppTheme.AppBarOverlay"
+            android:background="@android:color/holo_blue_dark"
+            android:id="@+id/appBar">
 
-    <include layout="@layout/content_main" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
 
-    <android.support.design.widget.FloatingActionButton android:id="@+id/fab"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end" android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+                <Button
+                    android:text="Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btn"
+                    android:visibility="invisible"
+                    android:layout_weight="1" />
 
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:text="Share Entry"
+                    android:id="@+id/btnShare"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:minHeight="0dp"
+                    style="@android:style/Widget.Holo.Light.ActionButton"
+                    android:layout_height="45dp"
+                    android:textSize="22sp"
+                    android:textStyle="normal|bold" />
+
+                <Button
+                    android:text="+"
+                    android:layout_width="wrap_content"
+                    android:id="@+id/btnNewEntry"
+                    android:layout_weight="1"
+                    android:minHeight="0dp"
+                    style="@android:style/Widget.Holo.Light.ActionButton"
+                    android:layout_height="45dp"
+                    android:textSize="22sp"
+                    android:textStyle="normal|bold" />
+
+            </LinearLayout>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alwaysDrawnWithCache="true"
+            android:layout_below="@+id/appBar"
+            android:id="@+id/tableDisplayEntry"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp">
+
+        </ListView>
+
+
+    </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

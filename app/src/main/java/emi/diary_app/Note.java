@@ -1,4 +1,4 @@
-package emi.note_app;
+package emi.diary_app;
 
 public abstract class Note {
 
@@ -71,5 +71,6 @@ public abstract class Note {
         return this.noteType;
     }
 
+    abstract public String getNote();
 
 }

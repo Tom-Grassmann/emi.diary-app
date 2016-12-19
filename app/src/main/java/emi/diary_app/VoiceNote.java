@@ -1,4 +1,4 @@
-package emi.note_app;
+package emi.diary_app;
 
 public class VoiceNote extends Note {
 
@@ -27,5 +27,10 @@ public class VoiceNote extends Note {
         this.date_last_edited = date_last_edited;
         this.title = title;
         this.noteType = NoteType.VOICE;
+    }
+
+    public String getNote() {
+
+        return "";
     }
 }
