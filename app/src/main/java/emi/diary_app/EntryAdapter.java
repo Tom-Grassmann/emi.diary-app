@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -50,7 +51,7 @@ public class EntryAdapter extends BaseAdapter {
             TextView tvModifyDate = (TextView) v.findViewById(R.id.entry_text_tvModifyDate);
 
             tvTitle.setText(noteList.get(pos).getTitle());
-            tvContent.setText(noteList.get(pos).getNote());
+            tvContent.setText(noteList.get(pos).getTextNote());
             tvModifyDate.setText(noteList.get(pos).getdate_last_edited());
 
             v.setTag(noteList.get(pos).getID());
@@ -63,7 +64,7 @@ public class EntryAdapter extends BaseAdapter {
             View v = View.inflate(context, R.layout.diary_entry_voice, null);
 
             TextView tvTitle = (TextView) v.findViewById(R.id.entry_voice_tvTitle);
-            Button btnPlay = (Button) v.findViewById(R.id.entry_voice_btnPlay);
+            ImageView btnPlay = (ImageView) v.findViewById(R.id.entry_voice_btnPlay);
             TextView tvModifyDate = (TextView) v.findViewById(R.id.entry_voice_tvModifyDate);
             ProgressBar progBar = (ProgressBar) v.findViewById(R.id.entry_voice_progBar);
 

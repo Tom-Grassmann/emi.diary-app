@@ -12,7 +12,9 @@ public class MainActivity extends AppCompatActivity {
     private ListView table;
     private Button
             btnShare,
-            btnNewEntry;
+            btnNewEntry,
+            btnDelete;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,18 +33,23 @@ public class MainActivity extends AppCompatActivity {
 
         btnShare = (Button) findViewById(R.id.btnShare);
         btnNewEntry = (Button) findViewById(R.id.btnNewEntry);
+        btnDelete = (Button) findViewById(R.id.btnDelete);
 
-        final TableManager tableManager = new TableManager(getApplicationContext(), table);
+
+        final Database database = new Database(this);
+        final TableManager tableManager = new TableManager(getApplicationContext(), table, database);
+
 
 
         btnNewEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                VoiceNote tNote = new VoiceNote(0, "Datum", "new Entry");
-                //tNote.setText_note("Content");
 
-                tableManager.addEntry(tNote);
+                Note note = new Note(1, "Datum", "new Entry");
+                note.setTextNote("nochmal anders");
+                tableManager.updateEntry(note);
+
             }
         });
 
@@ -51,10 +58,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                TextNote tNote = new TextNote(0, "Datum", "new Entry");
-                tNote.setText_note("Das ist ein Tagebucheintrag...\n\n\nEnde.");
+                Note note = new Note(tableManager.getNextFreeID(), "Datum", "new Entry");
+                note.setTextNote("Das ist ein Tagebucheintrag...\n\n\nEnde.");
+                note.addToDatabase(database);
 
-                tableManager.addEntry(tNote);
+                tableManager.addEntry(note);
+            }
+        });
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Note note = new Note(1, "Datum", "new Entry");
+                tableManager.removeEntry(note);
             }
         });
 

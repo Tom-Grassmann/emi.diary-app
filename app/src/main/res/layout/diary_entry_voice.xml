@@ -40,24 +40,15 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@android:drawable/ic_media_play"
-            android:id="@+id/imageView"
-            android:layout_weight="1" />
-
-        <Button
-            android:text="▶"
-            android:layout_width="match_parent"
-            android:layout_weight="3"
             android:id="@+id/entry_voice_btnPlay"
-            android:textStyle="normal|bold"
-            style="@android:style/Widget.Holo.Light.ActionButton"
-            android:textSize="30dp"
-            android:layout_height="30dp"
-            android:textAlignment="center"
-            android:textAllCaps="false"
-            android:layout_marginLeft="5dp" />
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:adjustViewBounds="false"
+            android:layout_width="80dp"
+            android:layout_marginLeft="5dp"
+            android:clickable="true"
+            android:background="@android:drawable/ic_media_play" />
 
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
@@ -90,6 +81,7 @@
             android:textAlignment="viewEnd"
             android:layout_marginRight="15dp"
             android:layout_marginBottom="5dp" />
+
     </LinearLayout>
 
 </LinearLayout>

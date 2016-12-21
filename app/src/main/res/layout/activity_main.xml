@@ -23,11 +23,10 @@
                 android:layout_weight="1">
 
                 <Button
-                    android:text="Button"
+                    android:text="Delete"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/btn"
-                    android:visibility="invisible"
+                    android:id="@+id/btnDelete"
                     android:layout_weight="1" />
 
                 <Space
@@ -36,7 +35,7 @@
                     android:layout_weight="1" />
 
                 <Button
-                    android:text="Share Entry"
+                    android:text="Add"
                     android:id="@+id/btnShare"
                     android:layout_weight="1"
                     android:layout_width="wrap_content"
@@ -47,7 +46,7 @@
                     android:textStyle="normal|bold" />
 
                 <Button
-                    android:text="+"
+                    android:text="Change"
                     android:layout_width="wrap_content"
                     android:id="@+id/btnNewEntry"
                     android:layout_weight="1"
