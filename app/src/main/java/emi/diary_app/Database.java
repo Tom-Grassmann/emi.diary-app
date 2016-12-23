@@ -48,7 +48,7 @@ public class Database extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(TITLE, note.getTitle());
-        contentValues.put(DATE, note.getdate_last_edited());
+        contentValues.put(DATE, String.valueOf(note.getTimestamp()));
         contentValues.put(CONTEXT_TEXT, note.getTextNote());
         contentValues.put(CONTEXT_VOICE, note.getVoiceNote());
         contentValues.put(CONTEXT_IMAGE, note.getImageNote());
@@ -70,7 +70,7 @@ public class Database extends SQLiteOpenHelper {
 
         contentValues.put(ID, note.getID());
         contentValues.put(TITLE, note.getTitle());
-        contentValues.put(DATE, note.getdate_last_edited());
+        contentValues.put(DATE, String.valueOf(note.getTimestamp()));
         contentValues.put(CONTEXT_TEXT, note.getTextNote());
         contentValues.put(CONTEXT_VOICE, note.getVoiceNote());
         contentValues.put(CONTEXT_IMAGE, note.getImageNote());
@@ -85,6 +85,24 @@ public class Database extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         return db.rawQuery("select * from " +TABLE_NAME, null);
+    }
+
+    /* For Testing Only! */
+    public boolean removeAllData() {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+
+        String[] index = new String[1];
+        int i = 0;
+        while (i < 100000) {
+            index[0] = Integer.toString(i);
+            i++;
+
+            db.delete(TABLE_NAME, "ID = ?", index);
+        }
+
+        return true;
     }
 
     public boolean removeData(Note note) throws NullPointerException {

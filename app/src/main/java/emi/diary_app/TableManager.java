@@ -2,7 +2,6 @@ package emi.diary_app;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.provider.ContactsContract;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -10,6 +9,7 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 
 public class TableManager {
@@ -27,6 +27,10 @@ public class TableManager {
             throw new NullPointerException("Table darf nicht NULL sein!");
         }
 
+        if (database == null) {
+            throw new NullPointerException("Datenbank darf nicht NULL sein!");
+        }
+
         this.table = table;
         this.context = context;
 
@@ -37,15 +41,16 @@ public class TableManager {
 
         while (data.moveToNext()) {
 
-            String x = data.getString(3);
-
-            Note note = new Note(data.getInt(0), data.getString(2), data.getString(1));
+            Note note = new Note(data.getInt(0), data.getString(1));
+            note.setTimestamp(data.getLong(2));
             note.setTextNote(data.getString(3));
             note.setVoiceNote(data.getString(4));
             note.setImageNote(data.getString(5));
 
             this.arrayList.add(note);
         }
+
+        Collections.sort(this.arrayList);
 
         this.adapter = new EntryAdapter(this.context, this.arrayList);
         this.table.setAdapter(this.adapter);
@@ -91,7 +96,18 @@ public class TableManager {
             throw new NullPointerException("Note darf nicht NULL sein!");
         }
 
-        this.arrayList.add(note);
+        /* Update the Timestamp of the Note */
+        long tsLong = System.currentTimeMillis();
+        note.setTimestamp(tsLong);
+
+        /* When new Entry -> Add to Database */
+        if (!this.arrayList.contains(note)) {
+
+            this.database.insertData(note);
+        }
+
+        /* Add to List and Adapter */
+        this.arrayList.add(0, note);
         this.adapter.notifyDataSetChanged();
 
     }
@@ -117,6 +133,10 @@ public class TableManager {
         if (!this.arrayList.contains(note)) {
             return false;
         }
+
+        /* Update the Timestamp of the Note */
+        long tsLong = System.currentTimeMillis();
+        note.setTimestamp(tsLong);
 
         /* Update the Entry in List */
         int posInList = this.arrayList.indexOf(note);

@@ -8,10 +8,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.List;
+
+import static emi.diary_app.R.drawable.defqon1;
 
 public class EntryAdapter extends BaseAdapter {
 
@@ -41,59 +44,47 @@ public class EntryAdapter extends BaseAdapter {
     @Override
     public View getView(int pos, View view, ViewGroup viewGroup) {
 
-        /* Set View for a Text Note [see diary_entry_text.xml] */
-        if (noteList.get(pos).getNoteType() == NoteType.TEXT) {
+        Note note = noteList.get(pos);
 
-            View v = View.inflate(context, R.layout.diary_entry_text, null);
+        /* Create Main view */
+        View entry = View.inflate(context, R.layout.entry, null);
 
-            TextView tvTitle = (TextView) v.findViewById(R.id.entry_text_tvTitle);
-            TextView tvContent = (TextView) v.findViewById(R.id.entry_text_tvContent);
-            TextView tvModifyDate = (TextView) v.findViewById(R.id.entry_text_tvModifyDate);
+        TextView tvTitle = (TextView) entry.findViewById(R.id.tvTitle);
+        TextView tvDate = (TextView) entry.findViewById(R.id.tvDate);
 
-            tvTitle.setText(noteList.get(pos).getTitle());
-            tvContent.setText(noteList.get(pos).getTextNote());
-            tvModifyDate.setText(noteList.get(pos).getdate_last_edited());
+        /* Set Title and Date */
+        tvTitle.setText(note.getTitle());
+        tvDate.setText(note.getDate());
 
-            v.setTag(noteList.get(pos).getID());
 
-            return v;
+        LinearLayout entryText = (LinearLayout) entry.findViewById(R.id.entryText);
+        LinearLayout entryVoice = (LinearLayout) entry.findViewById(R.id.entryVoice);
+        LinearLayout entryImage = (LinearLayout) entry.findViewById(R.id.entryImage);
 
-        /* Set View for a Text Note [see diary_entry_voice.xml] */
-        } else if (noteList.get(pos).getNoteType() == NoteType.VOICE) {
+        /* Setting up TextEntry */
+        View textEntry = View.inflate(context, R.layout.diary_entry_text, null);
+        TextView textContent = (TextView) textEntry.findViewById(R.id.textContent);
+        textContent.setText(note.getTextNote());
 
-            View v = View.inflate(context, R.layout.diary_entry_voice, null);
+        /* Setting up VoiceEntry */
+        View voiceEntry = View.inflate(context, R.layout.diary_entry_voice, null);
+        ImageView voiceContent = (ImageView) voiceEntry.findViewById(R.id.playVoiceContent);
+        ProgressBar playerProgressBar = (ProgressBar) voiceEntry.findViewById(R.id.playerProgressBar);
+        // TODO: Set up Voice Content
 
-            TextView tvTitle = (TextView) v.findViewById(R.id.entry_voice_tvTitle);
-            ImageView btnPlay = (ImageView) v.findViewById(R.id.entry_voice_btnPlay);
-            TextView tvModifyDate = (TextView) v.findViewById(R.id.entry_voice_tvModifyDate);
-            ProgressBar progBar = (ProgressBar) v.findViewById(R.id.entry_voice_progBar);
+        /* Setting up ImageContent */
+        View imageEntry = View.inflate(context, R.layout.diary_entry_picture, null);
+        ImageView imageContent = (ImageView) imageEntry.findViewById(R.id.imageContent);
+        imageContent.setBackgroundResource(R.drawable.android_logo);
+        // TODO: Set up Image Content
 
-            tvTitle.setText(noteList.get(pos).getTitle());
-            tvModifyDate.setText(noteList.get(pos).getdate_last_edited());
 
-            /* Setting up Play Button */
-            btnPlay.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+        entryText.addView(textEntry);
+        entryVoice.addView(voiceEntry);
+        entryImage.addView(imageEntry);
 
-                    // TODO: Play VoiceEntry
+        return entry;
 
-                }
-            });
 
-            v.setTag(noteList.get(pos).getID());
-
-            return v;
-
-        } else if (noteList.get(pos).getNoteType() == NoteType.PICTURE) {
-
-            // TODO: Add Picture View
-
-            return null;
-
-        } else {
-
-            return null;
-        }
     }
 }

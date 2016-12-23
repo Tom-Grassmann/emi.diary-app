@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         final Database database = new Database(this);
+        //database.removeAllData();
         final TableManager tableManager = new TableManager(getApplicationContext(), table, database);
 
 
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
 
-                Note note = new Note(1, "Datum", "new Entry");
+                Note note = new Note(tableManager.getNextFreeID() - 1, "new Entry");
                 note.setTextNote("nochmal anders");
                 tableManager.updateEntry(note);
 
@@ -58,9 +59,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Note note = new Note(tableManager.getNextFreeID(), "Datum", "new Entry");
+                Note note = new Note(tableManager.getNextFreeID(), "new Entry");
                 note.setTextNote("Das ist ein Tagebucheintrag...\n\n\nEnde.");
-                note.addToDatabase(database);
 
                 tableManager.addEntry(note);
             }
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Note note = new Note(1, "Datum", "new Entry");
+                Note note = new Note(tableManager.getNextFreeID() - 1, "new Entry");
                 tableManager.removeEntry(note);
             }
         });

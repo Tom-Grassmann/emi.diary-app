@@ -1,11 +1,15 @@
 package emi.diary_app;
 
+import android.text.format.DateFormat;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Locale;
+
 
 public class Note implements Comparator<Note>, Comparable<Note>{
 
     protected int ID;
-    protected String date_last_edited;
+    protected long timestamp;
     protected String title;
 
     protected String text_note = "";
@@ -15,11 +19,8 @@ public class Note implements Comparator<Note>, Comparable<Note>{
     protected NoteType noteType;
 
 
-    public Note(int ID, String date_last_edited, String title) {
+    public Note(int ID, String title) {
 
-        if (date_last_edited == null) {
-            throw new NullPointerException("Date to set cant be NULL!");
-        }
         if (title == null) {
             throw new NullPointerException("Title to set cant be NULL!");
         }
@@ -27,12 +28,8 @@ public class Note implements Comparator<Note>, Comparable<Note>{
         if (ID < 0) {
             throw new IllegalArgumentException("ID should be greater than 0!");
         }
-        if (date_last_edited.equals("")) {
-            throw new IllegalArgumentException("Date should not be empty!");
-        }
 
         this.ID = ID;
-        this.date_last_edited = date_last_edited;
         this.title = title;
         this.noteType = NoteType.TEXT;
     }
@@ -40,24 +37,6 @@ public class Note implements Comparator<Note>, Comparable<Note>{
     public int getID() {
 
         return this.ID;
-    }
-
-    public String getdate_last_edited() {
-
-        return this.date_last_edited;
-    }
-
-    public void setdate_last_edited(String newDate){
-
-        if (newDate == null) {
-            throw new NullPointerException("Date to ste cant be NULL!");
-        }
-
-        if (newDate.equals("")) {
-            throw new IllegalArgumentException("Date to set cant be empty!");
-        }
-
-        this.date_last_edited = newDate;
     }
 
     public String getTitle() {
@@ -123,17 +102,9 @@ public class Note implements Comparator<Note>, Comparable<Note>{
 
     public void addToDatabase(Database db) {
 
-        // TODO: Context ID
         if (!db.insertData(this)) {
             System.out.println("ERROR adding Note to Database!");
         }
-    }
-
-    @Override
-    public int compare(Note note, Note t1) {
-
-
-        return 0;
     }
 
     public boolean equals(Object object) {
@@ -157,9 +128,40 @@ public class Note implements Comparator<Note>, Comparable<Note>{
         }
     }
 
+    public void setTimestamp(long timestamp) {
+
+        this.timestamp = timestamp;
+    }
+
+    public long getTimestamp() {
+
+        return this.timestamp;
+    }
+
+    public String getDate() {
+
+        Calendar calendar = Calendar.getInstance(Locale.GERMAN);
+        calendar.setTimeInMillis(this.timestamp);
+        DateFormat dateFormat = new DateFormat();
+
+        return dateFormat.format("hh:mm:ss, dd.MM.yyyy", calendar).toString();
+    }
+
+
+    @Override
+    public int compare(Note note, Note t1) {
+
+
+        return 0;
+    }
 
     @Override
     public int compareTo(Note note) {
-        return 0;
+
+        if (this.timestamp == note.getTimestamp()) { return 0; }
+        if (this.timestamp < note.getTimestamp()) { return 1; }
+        if (this.timestamp > note.getTimestamp()) {return -1; }
+        else return 0;
+
     }
 }
