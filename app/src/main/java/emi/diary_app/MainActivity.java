@@ -1,10 +1,13 @@
 package emi.diary_app;
 
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -38,7 +41,9 @@ public class MainActivity extends AppCompatActivity {
 
         final Database database = new Database(this);
         //database.removeAllData();
-        final TableManager tableManager = new TableManager(getApplicationContext(), table, database);
+        final TableManager tableManager = new TableManager(MainActivity.this, table, database);
+
+
 
 
 
@@ -47,9 +52,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
 
-                Note note = new Note(tableManager.getNextFreeID() - 1, "new Entry");
-                note.setTextNote("nochmal anders");
-                tableManager.updateEntry(note);
+                Note note = new Note(database.getNextFreeID() - 1, "Image Entry");
+                note.setTextNote("mit Bild...");
+
+                ImageView imageView = (ImageView) findViewById(R.id.imageView);
+                note.setImageNote(((BitmapDrawable)imageView.getDrawable()).getBitmap());
+                System.out.println(tableManager.updateEntry(note));
 
             }
         });
@@ -59,7 +67,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Note note = new Note(tableManager.getNextFreeID(), "new Entry");
+                int x = database.getNextFreeID();
+                System.out.println(Integer.toString(x));
+
+                Note note = new Note(database.getNextFreeID(), "new Entry");
                 note.setTextNote("Das ist ein Tagebucheintrag...\n\n\nEnde.");
 
                 tableManager.addEntry(note);
@@ -70,8 +81,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Note note = new Note(tableManager.getNextFreeID() - 1, "new Entry");
-                tableManager.removeEntry(note);
+                Toast.makeText(MainActivity.this, database.getTableAsString(), Toast.LENGTH_SHORT).show();
             }
         });
 

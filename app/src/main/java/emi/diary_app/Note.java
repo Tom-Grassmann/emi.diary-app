@@ -1,5 +1,6 @@
 package emi.diary_app;
 
+import android.graphics.Bitmap;
 import android.text.format.DateFormat;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -14,7 +15,7 @@ public class Note implements Comparator<Note>, Comparable<Note>{
 
     protected String text_note = "";
     protected String voice_note_path = "";
-    protected String image_note_path = "";
+    protected Bitmap image;
 
     protected NoteType noteType;
 
@@ -76,13 +77,9 @@ public class Note implements Comparator<Note>, Comparable<Note>{
         this.voice_note_path = text;
     }
 
-    public void setImageNote(String text) {
+    public void setImageNote(Bitmap image) {
 
-        if (text == null) {
-            throw new NullPointerException("Text to set as Note cant be NULL!");
-        }
-
-        this.image_note_path = text;
+        this.image = image;
     }
 
     public String getTextNote() {
@@ -95,9 +92,9 @@ public class Note implements Comparator<Note>, Comparable<Note>{
         return this.voice_note_path;
     }
 
-    public String getImageNote() {
+    public Bitmap getImageNote() {
 
-        return this.image_note_path;
+        return this.image;
     }
 
     public void addToDatabase(Database db) {

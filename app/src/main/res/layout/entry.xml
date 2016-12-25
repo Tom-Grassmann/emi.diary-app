@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:textIsSelectable="false">
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textIsSelectable="false"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp">
@@ -18,7 +22,17 @@
             android:textColor="#0d0d0d"
             android:textSize="20sp"
             android:id="@+id/tvTitle"
-            android:textStyle="normal|bold" />
+            android:textIsSelectable="false"
+            android:textStyle="normal|bold"
+            android:layout_weight="1"/>
+
+        <Button
+            android:layout_height="50dp"
+            android:id="@+id/btnEntryMenu"
+            android:layout_weight="1"
+            android:layout_width="50dp"
+            android:background="@android:drawable/ic_menu_sort_by_size"
+            android:elevation="0dp" />
 
     </LinearLayout>
 
@@ -26,6 +40,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textIsSelectable="false"
         android:id="@+id/entryText">
 
     </LinearLayout>
@@ -34,6 +49,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textIsSelectable="false"
         android:id="@+id/entryVoice">
 
     </LinearLayout>
@@ -42,6 +58,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textIsSelectable="false"
         android:id="@+id/entryImage">
 
     </LinearLayout>
@@ -50,6 +67,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textIsSelectable="false"
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginBottom="10dp">
@@ -59,6 +77,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="#999999"
+            android:textIsSelectable="false"
             android:textAlignment="textEnd"
             android:id="@+id/tvDate" />
     </LinearLayout>

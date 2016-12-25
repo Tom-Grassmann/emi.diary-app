@@ -2,15 +2,11 @@ package emi.diary_app;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.widget.ListView;
-import android.widget.PopupMenu;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 public class TableManager {
 
@@ -19,6 +15,7 @@ public class TableManager {
     private ArrayList<Note> arrayList;
     private EntryAdapter adapter;
     private Database database;
+    private int actualID = 0;
 
 
     public TableManager(final Context context, final ListView table, Database database) throws NullPointerException {
@@ -45,48 +42,26 @@ public class TableManager {
             note.setTimestamp(data.getLong(2));
             note.setTextNote(data.getString(3));
             note.setVoiceNote(data.getString(4));
-            note.setImageNote(data.getString(5));
+
+            /* Decode Image from path */
+            String picturePath = data.getString(5);
+            if (picturePath == null || picturePath.length() == 0)
+                note.setImageNote(null);
+
+            Bitmap image = BitmapFactory.decodeFile(picturePath);
+            note.setImageNote(image);
+
+            if (this.actualID <= note.getID()) {
+                this.actualID = note.getID();
+            }
 
             this.arrayList.add(note);
         }
 
         Collections.sort(this.arrayList);
 
-        this.adapter = new EntryAdapter(this.context, this.arrayList);
+        this.adapter = new EntryAdapter(this.context, this.arrayList, this);
         this.table.setAdapter(this.adapter);
-
-
-        this.table.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(final AdapterView<?> adapterView, View view, final int i, long l) {
-
-                PopupMenu popup = new PopupMenu(TableManager.this.context, view);
-                popup.getMenuInflater().inflate(R.menu.menu_click_on_entry, popup.getMenu());
-
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-
-                        if (item.getTitle().toString().equals("showEntry")) {
-
-                            /* SHOW ENTRY */
-                        }
-
-                        if (item.getTitle().toString().equals("editEntry")) {
-
-                            /* EDIT ENTRY */
-                        }
-
-                        return true;
-                    }
-                });
-
-                popup.show();
-
-                return false;
-            }
-        });
 
     }
 
@@ -118,7 +93,10 @@ public class TableManager {
             throw new NullPointerException("Note darf nicht NULL sein!");
         }
 
-        database.removeData(note);
+        if (!database.removeData(note)) {
+
+            System.out.println("Fehler beim löschen aus Datenbank!");
+        };
 
         this.arrayList.remove(note);
         this.adapter.notifyDataSetChanged();
@@ -155,7 +133,8 @@ public class TableManager {
 
     public int getNextFreeID() {
 
-        return this.arrayList.size() + 1;
+        this.actualID++;
+        return this.actualID;
     }
 }
 
