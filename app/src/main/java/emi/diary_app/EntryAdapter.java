@@ -3,8 +3,13 @@ package emi.diary_app;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
+import android.text.AndroidCharacter;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,18 +19,25 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
+import android.os.Handler;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static emi.diary_app.R.drawable.defqon1;
 
-public class EntryAdapter extends BaseAdapter {
+public class EntryAdapter extends BaseAdapter implements Serializable{
 
     private Context context;
     private ArrayList<Note> noteList;
     private TableManager tableManager;
+
+    private Handler seekHandler = new Handler();
+    private SeekBar playerSeekBar = null;
+    private MediaPlayer mediaPlayer = null;
 
     public EntryAdapter(Context context, ArrayList<Note> noteList, TableManager tableManager) {
         this.context = context;
@@ -47,6 +59,22 @@ public class EntryAdapter extends BaseAdapter {
     public long getItemId(int i) {
         return i;
     }
+
+
+    private Runnable run = new Runnable() {
+        @Override
+        public void run() {
+
+            seekUpdation();
+        }
+    };
+
+    private void seekUpdation() {
+
+        playerSeekBar.setProgress(mediaPlayer.getCurrentPosition());
+        seekHandler.postDelayed(run, 1000);
+    }
+
 
     @Override
     public View getView(int pos, View view, ViewGroup viewGroup) {
@@ -71,26 +99,129 @@ public class EntryAdapter extends BaseAdapter {
         /* Setting up TextEntry */
         View textEntry = View.inflate(context, R.layout.diary_entry_text, null);
         TextView textContent = (TextView) textEntry.findViewById(R.id.textContent);
-        textContent.setText(note.getTextNote() + " " + Integer.toString(note.getID()));
+        textContent.setText(note.getTextNote());
 
         /* Setting up VoiceEntry */
-        View voiceEntry = View.inflate(context, R.layout.diary_entry_voice, null);
-        Button playVoiceContent = (Button) voiceEntry.findViewById(R.id.playVoiceContent);
-        ProgressBar playerProgressBar = (ProgressBar) voiceEntry.findViewById(R.id.playerProgressBar);
-        // TODO: Set up Voice Content
+        View voiceEntry = null;
+        if (!note.getVoiceNote().equals("")) {
+
+            voiceEntry = View.inflate(context, R.layout.diary_entry_voice, null);
+
+            /* - - - Set up PlayButton - - - - - - - - - - - - - - - - - - - - - - - */
+            final PlayButton playVoiceContent = new PlayButton(context);
+            playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150, 150);
+            params.setMargins(5, 0, 0, 0);
+
+            playVoiceContent.setLayoutParams(params);
+
+            /* Add Button to Linear Layout */
+            LinearLayout linearLayout = (LinearLayout) voiceEntry.findViewById(R.id.voiceEntryLinLay);
+            linearLayout.addView(playVoiceContent, 0);
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+            /* - - - Set up SeekBar - - - - - - - - - - - - - - - - - - - - - - - -  */
+            playerSeekBar = (SeekBar) voiceEntry.findViewById(R.id.playerProgressBar);
+
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+
+            /* - - - Set up PlayButton and MediaPlayer - - - - -  - - - - - - - - -  */
+
+            /* Check if Audio is playing
+             * and Set the right Symbol and State
+             * of the Button */
+            if (mediaPlayer != null) {
+                if (mediaPlayer.isPlaying()) {
+
+                    playVoiceContent.IS_PLAYING = true;
+                    playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
+                }
+            }
+            playVoiceContent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    /* If Audio is playing */
+                    if (playVoiceContent.IS_PLAYING) {
+
+                        /* Set up "Pause" Icon */
+                        playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
+
+                        /* Pause Audio */
+                        mediaPlayer.pause();
+
+                        playVoiceContent.IS_PLAYING = false;
+
+                    /* If Audio is not playing */
+                    } else {
+
+                        /* Set up "Play" Icon */
+                        playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
+
+
+
+                        /* - - - Preparing MediaPlayer - - - - - - - - - - - - - - - - - - - - - */
+                        mediaPlayer = new MediaPlayer();
+                        try {
+                            mediaPlayer.setDataSource(note.getVoiceNote());
+                            mediaPlayer.prepare();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        /* Set OnCompletitionListener to MediaPlayer */
+                        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mediaPlayer) {
+
+                                /* Re-Preparing MediaPlayer */
+                                try {
+                                    mediaPlayer.setDataSource(note.getVoiceNote());
+                                    mediaPlayer.prepare();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                        /* Start Audio */
+                        mediaPlayer.start();
+
+                        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+                        playVoiceContent.IS_PLAYING = true;
+                    }
+                }
+            });
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+        }
+
 
         /* Setting up ImageContent */
         View imageEntry = View.inflate(context, R.layout.diary_entry_picture, null);
         ImageView imageContent = (ImageView) imageEntry.findViewById(R.id.imageContent);
-        if (note.getImageNote() != null) {
+        if (!note.getImageNote().equals("")) {
 
-            imageContent.setImageBitmap(note.getImageNote());
+            /* Decode Image from path */
+            Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
+
+            imageContent.setImageBitmap(image);
             imageContent.setMaxHeight(350);
         }
 
         /* Adding LinLayouts to the Entry */
         entryText.addView(textEntry);
-        entryVoice.addView(voiceEntry);
+        if (voiceEntry != null) {
+
+            entryVoice.addView(voiceEntry);
+        }
         entryImage.addView(imageEntry);
 
 
@@ -110,7 +241,11 @@ public class EntryAdapter extends BaseAdapter {
 
                         if (item.getTitle().toString().equals("Anzeigen")) {
 
-                            /* SHOW ENTRY */
+                            Intent i = new Intent(context, EditEntryActivity.class);
+                            i.putExtra("note", note);
+
+                            context.startActivity(i);
+
                         }
 
                         if (item.getTitle().toString().equals("Löschen")) {

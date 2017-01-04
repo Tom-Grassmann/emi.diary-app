@@ -5,18 +5,18 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.ListView;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class TableManager {
+public class TableManager implements Serializable{
 
     private ListView table;
     private Context context;
     private ArrayList<Note> arrayList;
     private EntryAdapter adapter;
     private Database database;
-    private int actualID = 0;
-
 
     public TableManager(final Context context, final ListView table, Database database) throws NullPointerException {
 
@@ -42,18 +42,7 @@ public class TableManager {
             note.setTimestamp(data.getLong(2));
             note.setTextNote(data.getString(3));
             note.setVoiceNote(data.getString(4));
-
-            /* Decode Image from path */
-            String picturePath = data.getString(5);
-            if (picturePath == null || picturePath.length() == 0)
-                note.setImageNote(null);
-
-            Bitmap image = BitmapFactory.decodeFile(picturePath);
-            note.setImageNote(image);
-
-            if (this.actualID <= note.getID()) {
-                this.actualID = note.getID();
-            }
+            note.setImageNote(data.getString(5));
 
             this.arrayList.add(note);
         }
@@ -131,11 +120,7 @@ public class TableManager {
         return true;
     }
 
-    public int getNextFreeID() {
 
-        this.actualID++;
-        return this.actualID;
-    }
 }
 
 

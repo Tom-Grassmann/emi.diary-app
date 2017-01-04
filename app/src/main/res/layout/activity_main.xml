@@ -9,7 +9,6 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/android_logo"
         android:id="@+id/imageView"
         android:visibility="invisible" />
 
@@ -36,10 +35,16 @@
                     android:id="@+id/btnDelete"
                     android:layout_weight="1" />
 
-                <Space
+                <Button
+                    android:text="Edit"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:id="@+id/btnEdit"
+                    android:layout_weight="1"
+                    android:minHeight="0dp"
+                    style="@android:style/Widget.Holo.Light.ActionButton"
+                    android:layout_height="45dp"
+                    android:textSize="22sp"
+                    android:textStyle="normal|bold"/>
 
                 <Button
                     android:text="Add"

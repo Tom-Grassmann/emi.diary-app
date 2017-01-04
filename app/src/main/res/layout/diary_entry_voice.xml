@@ -2,25 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     android:textIsSelectable="false"
     android:orientation="horizontal"
     android:background="@color/colorVoiceEntryBackground"
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
     android:layout_marginRight="10dp"
-    android:layout_marginLeft="10dp">
+    android:layout_marginLeft="10dp"
+    android:id="@+id/voiceEntryLinLay"
+    android:layout_height="40dp">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/playVoiceContent"
-        android:layout_weight="1"
-        android:background="@android:drawable/ic_media_play"
-        android:layout_marginLeft="5dp" />
 
-    <ProgressBar
-        style="?android:attr/progressBarStyleHorizontal"
+    <SeekBar
+        style="@android:style/Widget.Holo.SeekBar"
         android:layout_width="match_parent"
         android:textIsSelectable="false"
         android:layout_weight="1"

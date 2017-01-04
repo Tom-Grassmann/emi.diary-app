@@ -10,10 +10,11 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.Serializable;
 
 import static java.lang.Math.abs;
 
-public class Database extends SQLiteOpenHelper {
+public class Database extends SQLiteOpenHelper implements Serializable{
 
     private Context appContext;
 
@@ -54,28 +55,6 @@ public class Database extends SQLiteOpenHelper {
             throw new NullPointerException("Inserted Note cant be NULL!");
         }
 
-        /* Write Image to internal Storage and extract the Path of it */
-        String picturePath = "";
-        if (note.getImageNote() != null) {
-
-            File internalStorage = appContext.getDir("Pictures", Context.MODE_PRIVATE);
-            File reportFilePath = new File(internalStorage, note.getID() + ".png");
-            picturePath = reportFilePath.toString();
-
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(reportFilePath);
-                note.getImageNote().compress(Bitmap.CompressFormat.PNG, 100 /*quality*/, fos);
-                fos.close();
-            }
-            catch (Exception ex) {
-                Log.i("DATABASE", "Problem updating picture", ex);
-                picturePath = "";
-            }
-        }
-
-
-
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -84,7 +63,7 @@ public class Database extends SQLiteOpenHelper {
         contentValues.put(DATE, String.valueOf(note.getTimestamp()));
         contentValues.put(CONTEXT_TEXT, note.getTextNote());
         contentValues.put(CONTEXT_VOICE, note.getVoiceNote());
-        contentValues.put(CONTEXT_IMAGE, picturePath);
+        contentValues.put(CONTEXT_IMAGE, note.getImageNote());
 
 
         long result = db.insert(TABLE_NAME, null, contentValues);
@@ -98,26 +77,6 @@ public class Database extends SQLiteOpenHelper {
             throw new NullPointerException("Updated Note cant be NULL!");
         }
 
-                /* Write Image to internal Storage and extract the Path of it */
-        String picturePath = "";
-        if (note.getImageNote() != null) {
-
-            File internalStorage = appContext.getDir("Pictures", Context.MODE_PRIVATE);
-            File FilePath = new File(internalStorage, note.getID() + ".png");
-            picturePath = FilePath.toString();
-
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(FilePath);
-                note.getImageNote().compress(Bitmap.CompressFormat.PNG, 100 /*quality*/, fos);
-                fos.close();
-            }
-            catch (Exception ex) {
-                Log.i("DATABASE", "Problem updating picture", ex);
-                picturePath = "";
-            }
-        }
-
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -126,7 +85,7 @@ public class Database extends SQLiteOpenHelper {
         contentValues.put(DATE, String.valueOf(note.getTimestamp()));
         contentValues.put(CONTEXT_TEXT, note.getTextNote());
         contentValues.put(CONTEXT_VOICE, note.getVoiceNote());
-        contentValues.put(CONTEXT_IMAGE, picturePath);
+        contentValues.put(CONTEXT_IMAGE, note.getImageNote());
 
         long result = db.update(TABLE_NAME, contentValues, "ID = ?", new String[] { Integer.toString(note.getID()) });
 
@@ -252,6 +211,25 @@ public class Database extends SQLiteOpenHelper {
     }
 
 
+    /* Write Image to internal Storage and extract the Path of it */
+    /*String picturePath = "";
+    if (note.getImageNote() != null) {
+
+        File internalStorage = appContext.getDir("Pictures", Context.MODE_PRIVATE);
+        File reportFilePath = new File(internalStorage, note.getID() + ".png");
+        picturePath = reportFilePath.toString();
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(reportFilePath);
+            note.getImageNote().compress(Bitmap.CompressFormat.PNG, 100 , fos);
+            fos.close();
+        }
+        catch (Exception ex) {
+            Log.i("DATABASE", "Problem updating picture", ex);
+            picturePath = "";
+        }
+    }*/
 
 
 }

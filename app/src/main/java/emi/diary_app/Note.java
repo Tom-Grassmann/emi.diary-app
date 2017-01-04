@@ -1,13 +1,16 @@
 package emi.diary_app;
 
 import android.graphics.Bitmap;
+import android.os.Parcelable;
 import android.text.format.DateFormat;
+
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Locale;
 
 
-public class Note implements Comparator<Note>, Comparable<Note>{
+public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
 
     protected int ID;
     protected long timestamp;
@@ -15,7 +18,7 @@ public class Note implements Comparator<Note>, Comparable<Note>{
 
     protected String text_note = "";
     protected String voice_note_path = "";
-    protected Bitmap image;
+    protected String image_note_path = "";
 
     protected NoteType noteType;
 
@@ -77,9 +80,9 @@ public class Note implements Comparator<Note>, Comparable<Note>{
         this.voice_note_path = text;
     }
 
-    public void setImageNote(Bitmap image) {
+    public void setImageNote(String image_note_path) {
 
-        this.image = image;
+        this.image_note_path = image_note_path;
     }
 
     public String getTextNote() {
@@ -92,9 +95,9 @@ public class Note implements Comparator<Note>, Comparable<Note>{
         return this.voice_note_path;
     }
 
-    public Bitmap getImageNote() {
+    public String getImageNote() {
 
-        return this.image;
+        return this.image_note_path;
     }
 
     public void addToDatabase(Database db) {
