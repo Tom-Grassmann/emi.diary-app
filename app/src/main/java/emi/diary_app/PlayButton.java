@@ -3,9 +3,15 @@ package emi.diary_app;
 import android.content.Context;
 import android.widget.Button;
 
+
+enum PlayState {
+
+    STOPPED, PLAYING, PAUSED;
+}
+
 public class PlayButton extends Button {
 
-    public boolean IS_PLAYING = false;
+    public PlayState state = PlayState.STOPPED;
 
     public PlayButton(Context context) {
         super(context);
@@ -13,13 +19,21 @@ public class PlayButton extends Button {
 
     }
 
+    public void setPlaying() {
 
-    /*     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/playVoiceContent"
-        android:layout_weight="1"
-        android:background="@android:drawable/ic_media_play"
-        android:layout_marginLeft="5dp" /> */
+        this.state = PlayState.PLAYING;
+    }
+
+    public void setPaused() {
+
+        this.state = PlayState.PAUSED;
+    }
+
+    public void setStopped() {
+
+        this.state = PlayState.STOPPED;
+    }
+
+
 
 }

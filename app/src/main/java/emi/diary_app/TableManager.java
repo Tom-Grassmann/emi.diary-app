@@ -44,6 +44,8 @@ public class TableManager implements Serializable{
             note.setVoiceNote(data.getString(4));
             note.setImageNote(data.getString(5));
 
+
+
             this.arrayList.add(note);
         }
 

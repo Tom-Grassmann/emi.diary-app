@@ -50,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textIsSelectable="false"
-        android:id="@+id/entryVoice">
+        android:id="@+id/entryImage">
 
     </LinearLayout>
 
@@ -59,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textIsSelectable="false"
-        android:id="@+id/entryImage">
+        android:id="@+id/entryVoice">
 
     </LinearLayout>
 

@@ -26,21 +26,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
-            android:text="Name"
             android:ems="10"
-            android:id="@+id/editTitle" />
+            android:id="@+id/editTitle"
+            android:hint="Titel" />
 
         <EditText
             android:layout_width="match_parent"
             android:inputType="textMultiLine"
-            android:text="Name"
             android:ems="10"
             android:id="@+id/editTextContent"
             android:scrollbars = "vertical"
             android:gravity="start"
             android:layout_gravity="center"
             android:verticalScrollbarPosition="defaultPosition"
-            android:layout_height="160dp" />
+            android:layout_height="160dp"
+            android:hint="Liebes Tagebuch" />
 
         <ImageButton
             android:layout_width="match_parent"

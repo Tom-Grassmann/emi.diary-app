@@ -25,10 +25,11 @@ import java.util.Collections;
 public class MainActivity extends AppCompatActivity {
 
     final static int EDIT_ENTRY = 1;
+    final static int ADD_ENTRY = 2;
 
     private ListView table;
     private Button
-            btnShare,
+            btnAdd,
             btnNewEntry,
             btnDelete,
             btnEdit;
@@ -46,16 +47,13 @@ public class MainActivity extends AppCompatActivity {
         InitializeApp();
     }
 
-
     public void InitializeApp() {
 
         setContentView(R.layout.activity_main);
 
         table = (ListView) findViewById(R.id.tableDisplayEntry);
 
-        btnShare = (Button) findViewById(R.id.btnShare);
-        btnNewEntry = (Button) findViewById(R.id.btnNewEntry);
-        btnDelete = (Button) findViewById(R.id.btnDelete);
+        btnAdd = (Button) findViewById(R.id.btnAdd);
         btnEdit = (Button) findViewById(R.id.btnEdit);
 
 
@@ -63,44 +61,22 @@ public class MainActivity extends AppCompatActivity {
         //database.removeAllData();
         tableManager = new TableManager(this, table, database);
 
-
-        btnNewEntry.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-
-                Note note = new Note(database.getNextFreeID() - 1, "Image Entry");
-                note.setTextNote("mit Bild...");
-
-                ImageView imageView = (ImageView) findViewById(R.id.imageView);
-                //note.setImageNote(((BitmapDrawable)imageView.getDrawable()).getBitmap());
-                System.out.println(tableManager.updateEntry(note));
-
-            }
-        });
-
-        btnShare.setOnClickListener(new View.OnClickListener() {
+        btnAdd.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
 
+                Note note = new Note(database.getNextFreeID(), "New Entry");
 
-                Note note = new Note(database.getNextFreeID(), "new Entry");
-                note.setTextNote("Das ist ein Tagebucheintrag...\n\n\nEnde.");
-                note.setVoiceNote("/data/data/emi.diary_app/app_Audio/1.mp3");
+                Intent i = new Intent(MainActivity.this, EditEntryActivity.class);
+                i.putExtra("note", note);
+                i.putExtra("requestCode", ADD_ENTRY);
 
-                tableManager.addEntry(note);
+                startActivityForResult(i, ADD_ENTRY);
+
+
             }
         });
-
-        btnDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Toast.makeText(MainActivity.this, database.getTableAsString(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
 
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
                     picturePath = "";
                 }
                 i.putExtra("imagePath", picturePath);
+                i.putExtra("requestCode", EDIT_ENTRY);
+
 
                 startActivityForResult(i, EDIT_ENTRY);
             }
@@ -165,6 +143,13 @@ public class MainActivity extends AppCompatActivity {
 
                     Toast.makeText(this, "Edit Failed!", Toast.LENGTH_SHORT).show();
                 }
+
+            } else if (requestCode == ADD_ENTRY) {
+
+                Note note = (Note) data.getSerializableExtra("note");
+                tableManager.addEntry(note);
+
+                Toast.makeText(this, "Neuer Eintrag hinzugefügt!", Toast.LENGTH_SHORT).show();
             }
 
         }

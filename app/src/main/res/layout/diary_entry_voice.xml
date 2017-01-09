@@ -1,27 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:textIsSelectable="false"
     android:orientation="horizontal"
-    android:background="@color/colorVoiceEntryBackground"
-    android:layout_marginTop="10dp"
-    android:layout_marginBottom="10dp"
-    android:layout_marginRight="10dp"
-    android:layout_marginLeft="10dp"
-    android:id="@+id/voiceEntryLinLay"
-    android:layout_height="40dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1">
 
-
-    <SeekBar
-        style="@android:style/Widget.Holo.SeekBar"
+    <LinearLayout
         android:layout_width="match_parent"
         android:textIsSelectable="false"
-        android:layout_weight="1"
-        android:id="@+id/playerProgressBar"
-        android:progress="0"
+        android:orientation="horizontal"
+        android:background="@color/colorVoiceEntryBackground"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/voiceEntryLinLay"
+        android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="10dp" />
+        android:layout_height="wrap_content">
+        >
+
+        <SeekBar
+            style="@android:style/Widget.Holo.SeekBar"
+            android:layout_width="match_parent"
+            android:textIsSelectable="false"
+            android:layout_weight="1"
+            android:id="@+id/playerProgressBar"
+            android:progress="0"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_height="30dp"
+            android:minHeight="14dp" />
+
+
+
+    </LinearLayout>
+
+
+
+
 
 </LinearLayout>

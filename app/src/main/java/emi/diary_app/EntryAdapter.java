@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
+import android.support.v7.app.AppCompatActivity;
 import android.text.AndroidCharacter;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +32,8 @@ import java.util.List;
 
 public class EntryAdapter extends BaseAdapter implements Serializable{
 
+    private static final int EDIT_ENTRY = 1;
+
     private Context context;
     private ArrayList<Note> noteList;
     private TableManager tableManager;
@@ -38,6 +41,7 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
     private Handler seekHandler = new Handler();
     private SeekBar playerSeekBar = null;
     private MediaPlayer mediaPlayer = null;
+    private int actualNotePlaying = -1;
 
     public EntryAdapter(Context context, ArrayList<Note> noteList, TableManager tableManager) {
         this.context = context;
@@ -113,6 +117,8 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150, 150);
             params.setMargins(5, 0, 0, 0);
+            params.height = 110;
+            params.width = 110;
 
             playVoiceContent.setLayoutParams(params);
 
@@ -134,11 +140,15 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
             /* Check if Audio is playing
              * and Set the right Symbol and State
              * of the Button */
-            if (mediaPlayer != null) {
+            if (mediaPlayer != null && note.getID() == actualNotePlaying) {
                 if (mediaPlayer.isPlaying()) {
 
-                    playVoiceContent.IS_PLAYING = true;
+                    playVoiceContent.setPlaying();
                     playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
+
+                } else if (mediaPlayer.getCurrentPosition() != 0) {
+
+
                 }
             }
             playVoiceContent.setOnClickListener(new View.OnClickListener() {
@@ -146,23 +156,24 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                 public void onClick(View view) {
 
                     /* If Audio is playing */
-                    if (playVoiceContent.IS_PLAYING) {
+                    if (playVoiceContent.state == PlayState.PLAYING) {
 
                         /* Set up "Pause" Icon */
                         playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
 
                         /* Pause Audio */
                         mediaPlayer.pause();
+                        actualNotePlaying = -1;
 
-                        playVoiceContent.IS_PLAYING = false;
+                        playVoiceContent.setPaused();
 
-                    /* If Audio is not playing */
-                    } else {
+                    /* If Audio is stopped */
+                    } else if (playVoiceContent.state == PlayState.STOPPED && actualNotePlaying == -1){
 
                         /* Set up "Play" Icon */
                         playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
 
-
+                        // TODO: Look if there Play other Audio Files!
 
                         /* - - - Preparing MediaPlayer - - - - - - - - - - - - - - - - - - - - - */
                         mediaPlayer = new MediaPlayer();
@@ -185,16 +196,30 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
+
+                                actualNotePlaying = -1;
                             }
                         });
 
                         /* Start Audio */
                         mediaPlayer.start();
+                        actualNotePlaying = note.getID();
 
                         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-                        playVoiceContent.IS_PLAYING = true;
+                        playVoiceContent.setPlaying();
+
+                    /* If Audio is paused */
+                    } else if (playVoiceContent.state == PlayState.PAUSED) {
+
+                        /* Set up "Play" Icon */
+                        playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
+
+                        mediaPlayer.start();
+                        actualNotePlaying = note.getID();
+
+                        playVoiceContent.setPlaying();
                     }
                 }
             });
@@ -243,9 +268,12 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
                             Intent i = new Intent(context, EditEntryActivity.class);
                             i.putExtra("note", note);
+                            i.putExtra("requestCode", EDIT_ENTRY);
 
-                            context.startActivity(i);
+                            if (context instanceof MainActivity) {
 
+                                ((MainActivity) context).startActivityForResult(i, EDIT_ENTRY);
+                            }
                         }
 
                         if (item.getTitle().toString().equals("Löschen")) {

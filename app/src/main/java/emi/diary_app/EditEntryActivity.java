@@ -52,10 +52,14 @@ public class EditEntryActivity extends AppCompatActivity {
     private ImageButton
             imageButton;
 
+    private File audioFile = null;
+
     private MediaPlayer mediaPlayer;
 
     private MediaRecorder mediaRecorder;
-    private String audiopath = "";
+
+    private static final int EDIT_ENTRY = 1;
+    private int REQUEST_CODE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +67,7 @@ public class EditEntryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_entry);
 
         this.note = (Note) getIntent().getSerializableExtra("note");
+        REQUEST_CODE = (int) getIntent().getSerializableExtra("requestCode");
 
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -81,8 +86,6 @@ public class EditEntryActivity extends AppCompatActivity {
 
         imageButton = (ImageButton) findViewById(R.id.imageButton);
 
-        editTitle.setText(note.getTitle());
-        editTextContent.setText(note.getTextNote());
 
         /* Load Image when existing */
         if (!note.getImageNote().equals("")) {
@@ -90,6 +93,15 @@ public class EditEntryActivity extends AppCompatActivity {
             Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
             imageButton.setImageBitmap(image);
         }
+
+        if (REQUEST_CODE == EDIT_ENTRY) {
+
+            editTitle.setText(note.getTitle());
+            editTextContent.setText(note.getTextNote());
+        }
+
+        File internalStorage = this.getDir("Audio", Context.MODE_PRIVATE);
+        audioFile = new File(internalStorage, note.getID() + ".3gp");
 
 
 
@@ -99,6 +111,12 @@ public class EditEntryActivity extends AppCompatActivity {
 
                 note.setTitle(editTitle.getText().toString());
                 note.setTextNote(editTextContent.getText().toString());
+
+
+                if (audioFile.exists()) {
+
+                    note.setVoiceNote(audioFile.getPath());
+                }
 
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("note", note);
@@ -131,28 +149,28 @@ public class EditEntryActivity extends AppCompatActivity {
 
                 if (btnRecordAudio.getText().toString().equals("Record")) {
 
-                    /* Get App Directory Path */
-                    PackageManager m = getPackageManager();
-                    String appDir = getPackageName();
-                    PackageInfo p = null;
+
                     try {
-                        p = m.getPackageInfo(appDir, 0);
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
+                        startRecord();
+                    } catch (Exception e) {
+
+                        String filename = "errLogBtn";
+                        FileOutputStream outputStream;
+
+                        try {
+                            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+                            outputStream.write(e.toString().getBytes());
+                            outputStream.close();
+                        } catch (Exception ex) {
+                            e.printStackTrace();
+                        }
                     }
-                    appDir = p.applicationInfo.dataDir;
-
-                    /* Add AudioDir and DataName to the Path */
-                    audiopath = appDir + "/app_Audio/" + note.getID() + ".3pp";
-                    System.out.println(audiopath);
-
-                    //startRecord();
 
                     btnRecordAudio.setText("Stop Record");
 
                 } else if (btnRecordAudio.getText().toString().equals("Stop Record")) {
 
-                    //stopRecord();
+                    stopRecord();
 
                     btnRecordAudio.setText("Record");
                 }
@@ -165,13 +183,13 @@ public class EditEntryActivity extends AppCompatActivity {
 
                 if (btnPlayAudio.getText().toString().equals("Play")) {
 
-                    //startPlay();
+                    startPlay();
 
                     btnPlayAudio.setText("Stop");
 
                 } else if (btnPlayAudio.getText().toString().equals("Stop")) {
 
-                    //stopPlay();
+                    stopPlay();
 
                     btnPlayAudio.setText("Play");
                 }
@@ -180,55 +198,65 @@ public class EditEntryActivity extends AppCompatActivity {
 
     }
 
-    void startRecord() {
+    void startRecord() throws Exception {
 
-        if (mediaRecorder != null) {
+        try {
 
-            mediaRecorder.release();
-        }
+            if (mediaRecorder != null) {
 
-        File audioRecord = new File(audiopath);
+                mediaRecorder.release();
+            }
+
 
         /* Override existing File */
-        if (audioRecord != null) {
+            if (audioFile != null) {
 
-            audioRecord.delete();
+                audioFile.delete();
+            }
+
+
+            mediaRecorder = new MediaRecorder();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+
+
+
+            mediaRecorder.setOutputFile(audioFile.getPath());
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+            try {
+                mediaRecorder.prepare();
+            } catch (IOException e) {
+                Log.e("AudioRecord", "prepare() failed");
+                e.printStackTrace();
+            }
+            mediaRecorder.start();
+
+        } catch (Exception e) {
+
+            String filename = "errLog";
+            FileOutputStream outputStream;
+
+            try {
+                outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+                outputStream.write(e.toString().getBytes());
+                outputStream.close();
+            } catch (Exception ex) {
+                e.printStackTrace();
+            }
         }
 
-        String mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-        mFileName += "/audiorecordtest.3gp";
-
-        /*mediaRecorder = new MediaRecorder();
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mediaRecorder.setOutputFile(mFileName);
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);*/
-
-        MediaRecorder recorder = new MediaRecorder();
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        recorder.setOutputFile(mFileName);
-        try {
-            recorder.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        recorder.start();
-
-
-        /*try {
-            mediaRecorder.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mediaRecorder.start();*/
     }
+
+
+
 
     void stopRecord() {
 
         mediaRecorder.stop();
+        mediaRecorder.reset();
         mediaRecorder.release();
+        mediaRecorder = null;
     }
 
     void startPlay() {
@@ -243,7 +271,7 @@ public class EditEntryActivity extends AppCompatActivity {
 
         /* Set up MediaPlayer */
         try {
-            mediaPlayer.setDataSource(audiopath);
+            mediaPlayer.setDataSource(audioFile.getPath());
             mediaPlayer.prepare();
             mediaPlayer.start();
 

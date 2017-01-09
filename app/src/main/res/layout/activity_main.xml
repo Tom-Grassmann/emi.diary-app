@@ -29,13 +29,6 @@
                 android:layout_weight="1">
 
                 <Button
-                    android:text="Show DB"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/btnDelete"
-                    android:layout_weight="1" />
-
-                <Button
                     android:text="Edit"
                     android:layout_width="wrap_content"
                     android:id="@+id/btnEdit"
@@ -48,20 +41,9 @@
 
                 <Button
                     android:text="Add"
-                    android:id="@+id/btnShare"
+                    android:id="@+id/btnAdd"
                     android:layout_weight="1"
                     android:layout_width="wrap_content"
-                    android:minHeight="0dp"
-                    style="@android:style/Widget.Holo.Light.ActionButton"
-                    android:layout_height="45dp"
-                    android:textSize="22sp"
-                    android:textStyle="normal|bold" />
-
-                <Button
-                    android:text="Change"
-                    android:layout_width="wrap_content"
-                    android:id="@+id/btnNewEntry"
-                    android:layout_weight="1"
                     android:minHeight="0dp"
                     style="@android:style/Widget.Holo.Light.ActionButton"
                     android:layout_height="45dp"

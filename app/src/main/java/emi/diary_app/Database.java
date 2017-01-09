@@ -133,6 +133,13 @@ public class Database extends SQLiteOpenHelper implements Serializable{
             reportFilePath.delete();
         }
 
+        /* Delete Audio from internal Storage */
+        if (!note.getVoiceNote().equals("")) {
+
+            File voiceNote = new File(note.getVoiceNote());
+            System.out.println(voiceNote.delete());
+        }
+
         SQLiteDatabase db = this.getWritableDatabase();
         long result = db.delete(TABLE_NAME, "ID = ?", new String[] { Integer.toString(note.getID()) });
 
