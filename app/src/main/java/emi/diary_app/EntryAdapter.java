@@ -11,6 +11,7 @@ import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.text.AndroidCharacter;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class EntryAdapter extends BaseAdapter implements Serializable{
@@ -65,21 +67,6 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
     }
 
 
-    private Runnable run = new Runnable() {
-        @Override
-        public void run() {
-
-            seekUpdation();
-        }
-    };
-
-    private void seekUpdation() {
-
-        playerSeekBar.setProgress(mediaPlayer.getCurrentPosition());
-        seekHandler.postDelayed(run, 1000);
-    }
-
-
     @Override
     public View getView(int pos, View view, ViewGroup viewGroup) {
 
@@ -97,7 +84,7 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
 
         LinearLayout entryText = (LinearLayout) entry.findViewById(R.id.entryText);
-        LinearLayout entryVoice = (LinearLayout) entry.findViewById(R.id.entryVoice);
+        final LinearLayout entryVoice = (LinearLayout) entry.findViewById(R.id.entryVoice);
         LinearLayout entryImage = (LinearLayout) entry.findViewById(R.id.entryImage);
 
         /* Setting up TextEntry */
@@ -130,6 +117,7 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
             /* - - - Set up SeekBar - - - - - - - - - - - - - - - - - - - - - - - -  */
             playerSeekBar = (SeekBar) voiceEntry.findViewById(R.id.playerProgressBar);
+            note.setSeekBar(playerSeekBar);
 
             /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -145,6 +133,15 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
                     playVoiceContent.setPlaying();
                     playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
+
+
+                    // TODO: Update SeekBar when Audio was paused
+                    // TODO: And List scrolled down
+                    if (note.getLastPlayedDuration() != 0) {
+
+                        playerSeekBar = note.getSeekBar();
+
+                    }
 
                 } else if (mediaPlayer.getCurrentPosition() != 0) {
 
@@ -173,7 +170,8 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                         /* Set up "Play" Icon */
                         playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
 
-                        // TODO: Look if there Play other Audio Files!
+
+                        // TODO: Stop Player if there are Playing other Audios
 
                         /* - - - Preparing MediaPlayer - - - - - - - - - - - - - - - - - - - - - */
                         mediaPlayer = new MediaPlayer();
@@ -190,12 +188,19 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                             public void onCompletion(MediaPlayer mediaPlayer) {
 
                                 /* Re-Preparing MediaPlayer */
-                                try {
-                                    mediaPlayer.setDataSource(note.getVoiceNote());
-                                    mediaPlayer.prepare();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                mediaPlayer.stop();
+                                mediaPlayer.reset();
+                                mediaPlayer.release();
+
+                                /* Set State of PlayButton to "Stopped" */
+                                playVoiceContent.setStopped();
+
+                                /* Stop SeekBar-Updation */
+                                playerSeekBar.setProgress(0);
+
+                                /* Set up "Pause" Icon */
+                                playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
+
 
                                 actualNotePlaying = -1;
                             }
@@ -204,6 +209,13 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                         /* Start Audio */
                         mediaPlayer.start();
                         actualNotePlaying = note.getID();
+
+
+                        /* SeekBar updation */
+                        playerSeekBar = note.getSeekBar();
+                        playerSeekBar.setMax(mediaPlayer.getDuration());
+                        playerSeekBar.setProgress((int)startTime);
+                        myHandler.postDelayed(UpdateSongTime,100);
 
                         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -218,6 +230,12 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
                         mediaPlayer.start();
                         actualNotePlaying = note.getID();
+
+                        /* SeekBar updation */
+                        playerSeekBar = note.getSeekBar();
+                        playerSeekBar.setMax(mediaPlayer.getDuration());
+                        playerSeekBar.setProgress((int)startTime);
+                        myHandler.postDelayed(UpdateSongTime,100);
 
                         playVoiceContent.setPlaying();
                     }
@@ -316,4 +334,31 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
 
     }
+
+    private double startTime = 0;
+    private double finalTime = 0;
+
+    private Handler myHandler = new Handler();;
+
+    private Runnable UpdateSongTime = new Runnable() {
+        public void run() {
+
+            if (actualNotePlaying != -1) {
+
+                startTime = mediaPlayer.getCurrentPosition();
+
+                TextView tx1 = new TextView(context);
+
+                tx1.setText(String.format("%d min, %d sec",
+                        TimeUnit.MILLISECONDS.toMinutes((long) startTime),
+                        TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
+                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.
+                                        toMinutes((long) startTime)))
+                );
+
+                playerSeekBar.setProgress((int)startTime, true);
+                myHandler.postDelayed(this, 100);
+            }
+        }
+    };
 }

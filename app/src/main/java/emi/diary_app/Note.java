@@ -3,6 +3,7 @@ package emi.diary_app;
 import android.graphics.Bitmap;
 import android.os.Parcelable;
 import android.text.format.DateFormat;
+import android.widget.SeekBar;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -15,6 +16,9 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
     protected int ID;
     protected long timestamp;
     protected String title;
+
+    protected SeekBar seekBar;
+    protected int lastPlayedDuration;
 
     protected String text_note = "";
     protected String voice_note_path = "";
@@ -163,5 +167,22 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
         if (this.timestamp > note.getTimestamp()) {return -1; }
         else return 0;
 
+    }
+
+
+    public SeekBar getSeekBar() {
+        return seekBar;
+    }
+
+    public void setSeekBar(SeekBar seekBar) {
+        this.seekBar = seekBar;
+    }
+
+    public int getLastPlayedDuration() {
+        return lastPlayedDuration;
+    }
+
+    public void setLastPlayedDuration(int lastPlayedDuration) {
+        this.lastPlayedDuration = lastPlayedDuration;
     }
 }
