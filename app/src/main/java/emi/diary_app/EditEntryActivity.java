@@ -13,17 +13,26 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
@@ -32,14 +41,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
 
 public class EditEntryActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE = 2;
 
     private Button
-            btnPlayAudio,
-            btnRecordAudio,
             btnBack;
 
     private EditText
@@ -50,36 +58,50 @@ public class EditEntryActivity extends AppCompatActivity {
             note;
 
     private ImageButton
-            imageButton;
+            imageButton,
+            btnAddPicture,
+            btnRecordAudio;
+
+
+    private boolean RECORDING = false;
+
 
     private File audioFile = null;
 
-    private MediaPlayer mediaPlayer;
+    private MediaPlayer
+            mediaPlayer;
 
-    private MediaRecorder mediaRecorder;
+    private MediaRecorder
+            mediaRecorder;
+
+    private SeekBar
+            playerSeekBar;
 
     private static final int EDIT_ENTRY = 1;
     private int REQUEST_CODE = 0;
 
+    public EditEntryActivity() {
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_entry);
 
         this.note = (Note) getIntent().getSerializableExtra("note");
         REQUEST_CODE = (int) getIntent().getSerializableExtra("requestCode");
 
-
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+        this.setContentView(R.layout.activity_edit_entry);
 
         InitializeActivity();
     }
 
     public void InitializeActivity() {
 
-        btnPlayAudio = (Button) findViewById(R.id.btnPlayAudio);
-        btnRecordAudio = (Button) findViewById(R.id.btnRecordAudio);
         btnBack = (Button) findViewById(R.id.btnBack);
+        btnRecordAudio = (ImageButton) findViewById(R.id.btnRecordAudio);
+
 
         editTitle = (EditText) findViewById(R.id.editTitle);
         editTextContent = (EditText) findViewById(R.id.editTextContent);
@@ -98,6 +120,12 @@ public class EditEntryActivity extends AppCompatActivity {
 
             editTitle.setText(note.getTitle());
             editTextContent.setText(note.getTextNote());
+
+            /* Create View to Play Audio */
+            if (!note.getVoiceNote().equals("")) {
+
+                createAudioPlayer();
+            }
         }
 
         File internalStorage = this.getDir("Audio", Context.MODE_PRIVATE);
@@ -143,56 +171,53 @@ public class EditEntryActivity extends AppCompatActivity {
             }
         });
 
-        btnRecordAudio.setOnClickListener(new View.OnClickListener() {
+        btnRecordAudio.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-
-                if (btnRecordAudio.getText().toString().equals("Record")) {
+            public boolean onTouch(View view, MotionEvent motionEvent) {
 
 
-                    try {
-                        startRecord();
-                    } catch (Exception e) {
+                switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
 
-                        String filename = "errLogBtn";
-                        FileOutputStream outputStream;
+                    case MotionEvent.ACTION_DOWN:
+                        view.setPressed(true);
 
+                        /* Start Audio Record */
                         try {
-                            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-                            outputStream.write(e.toString().getBytes());
-                            outputStream.close();
-                        } catch (Exception ex) {
+                            startRecord();
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
-                    }
 
-                    btnRecordAudio.setText("Stop Record");
+                        /* Set up OnRecord Icon */
+                        btnRecordAudio.setImageDrawable(getResources().getDrawable(R.drawable.ic_microfphone_recording));
 
-                } else if (btnRecordAudio.getText().toString().equals("Stop Record")) {
+                        break;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_OUTSIDE:
+                    case MotionEvent.ACTION_CANCEL:
+                        view.setPressed(false);
 
-                    stopRecord();
+                        /* Stop Audio Record and Create Audio Player */
+                        try {
+                            stopRecord();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        createAudioPlayer();
 
-                    btnRecordAudio.setText("Record");
+                        /* Set up OnRecord Icon */
+                        btnRecordAudio.setImageDrawable(getResources().getDrawable(R.drawable.ic_microfphone));
+
+                        break;
+                    case MotionEvent.ACTION_POINTER_DOWN:
+                        break;
+                    case MotionEvent.ACTION_POINTER_UP:
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        break;
                 }
-            }
-        });
 
-        btnPlayAudio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (btnPlayAudio.getText().toString().equals("Play")) {
-
-                    startPlay();
-
-                    btnPlayAudio.setText("Stop");
-
-                } else if (btnPlayAudio.getText().toString().equals("Stop")) {
-
-                    stopPlay();
-
-                    btnPlayAudio.setText("Play");
-                }
+                return false;
             }
         });
 
@@ -233,22 +258,10 @@ public class EditEntryActivity extends AppCompatActivity {
             mediaRecorder.start();
 
         } catch (Exception e) {
-
-            String filename = "errLog";
-            FileOutputStream outputStream;
-
-            try {
-                outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-                outputStream.write(e.toString().getBytes());
-                outputStream.close();
-            } catch (Exception ex) {
-                e.printStackTrace();
-            }
+            e.printStackTrace();
         }
 
     }
-
-
 
 
     void stopRecord() {
@@ -257,42 +270,6 @@ public class EditEntryActivity extends AppCompatActivity {
         mediaRecorder.reset();
         mediaRecorder.release();
         mediaRecorder = null;
-    }
-
-    void startPlay() {
-
-        if (mediaPlayer != null) {
-
-            mediaPlayer.stop();
-            mediaPlayer.release();
-        }
-
-        mediaPlayer = new MediaPlayer();
-
-        /* Set up MediaPlayer */
-        try {
-            mediaPlayer.setDataSource(audioFile.getPath());
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-
-                mediaPlayer.release();
-            }
-        });
-
-
-    }
-
-    void stopPlay() {
-
-        mediaPlayer.stop();
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -336,5 +313,154 @@ public class EditEntryActivity extends AppCompatActivity {
             }
         }
     }
+
+    private void createAudioPlayer() {
+
+            /* Create View to Play Audio */
+            View voiceEntry = View.inflate(this, R.layout.diary_entry_voice, null);
+
+                 /* - - - Set up PlayButton - - - - - - - - - - - - - - - - - - - - - - - */
+            final PlayButton playVoiceContent = new PlayButton(this);
+            playVoiceContent.setBackground(this.getResources().getDrawable(R.drawable.ic_media_play));
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150, 150);
+            params.setMargins(5, 0, 0, 0);
+            params.height = 110;
+            params.width = 110;
+
+            playVoiceContent.setLayoutParams(params);
+
+                /* Add Button to Linear Layout */
+            LinearLayout linearLayout = (LinearLayout) voiceEntry.findViewById(R.id.voiceEntryLinLay);
+            linearLayout.addView(playVoiceContent, 0);
+                /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+            playerSeekBar = (SeekBar) voiceEntry.findViewById(R.id.playerProgressBar);
+
+            playVoiceContent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    /* If Audio is playing */
+                if (playVoiceContent.state == PlayState.PLAYING) {
+
+                        /* Set up "Pause" Icon */
+                    playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+
+                        /* Pause Audio */
+                    mediaPlayer.pause();
+
+                    playVoiceContent.setPaused();
+
+                     /* If Audio is stopped */
+                } else if (playVoiceContent.state == PlayState.STOPPED){
+
+                        /* Set up "Play" Icon */
+                    playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
+
+
+                        /* - - - Preparing MediaPlayer - - - - - - - - - - - - - - - - - - - - - */
+                    mediaPlayer = new MediaPlayer();
+                    try {
+                        mediaPlayer.setDataSource(note.getVoiceNote());
+                        mediaPlayer.prepare();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                        /* Set OnCompletitionListener to MediaPlayer */
+                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+
+                                /* Re-Preparing MediaPlayer */
+                            mediaPlayer.stop();
+                            mediaPlayer.reset();
+                            mediaPlayer.release();
+
+                                /* Set State of PlayButton to "Stopped" */
+                            playVoiceContent.setStopped();
+
+                                /* Stop SeekBar-Updation */
+                            playerSeekBar.setProgress(0);
+
+                                /* Set up "Pause" Icon */
+                            playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+                        }
+                    });
+
+                        /* Start Audio */
+                    mediaPlayer.start();
+
+
+                        /* SeekBar updation */
+                    playerSeekBar.setMax(mediaPlayer.getDuration());
+                    playerSeekBar.setProgress((int)startTime);
+                    myHandler.postDelayed(UpdateSongTime,100);
+
+                        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+                    playVoiceContent.setPlaying();
+
+                    /* If Audio is paused */
+                } else if (playVoiceContent.state == PlayState.PAUSED) {
+
+                        /* Set up "Play" Icon */
+                    playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
+
+                    mediaPlayer.start();
+
+                        /* SeekBar updation */
+                    playerSeekBar.setMax(mediaPlayer.getDuration());
+                    playerSeekBar.setProgress((int)startTime);
+                    myHandler.postDelayed(UpdateSongTime,100);
+
+                    playVoiceContent.setPlaying();
+                }
+            }
+        });
+
+
+        LinearLayout linearLayoutActivity = (LinearLayout) findViewById(R.id.LinearLayoutEditEntry);
+
+        /* If there is an Audio Player */
+        if (linearLayoutActivity.getChildCount() < 5) {
+
+            /* Remove it */
+            linearLayoutActivity.removeViewAt(4);
+
+        }
+        /* Adding View to LinearLayout from Activity */
+        linearLayoutActivity.addView(voiceEntry, 4);
+
+    }
+
+
+    private double startTime = 0;
+
+    private Handler myHandler = new Handler();;
+
+    private Runnable UpdateSongTime = new Runnable() {
+        public void run() {
+
+            if (true) {
+
+                startTime = mediaPlayer.getCurrentPosition();
+
+                TextView tx1 = new TextView(EditEntryActivity.this);
+
+                tx1.setText(String.format("%d min, %d sec",
+                        TimeUnit.MILLISECONDS.toMinutes((long) startTime),
+                        TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
+                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.
+                                        toMinutes((long) startTime)))
+                );
+
+                playerSeekBar.setProgress((int)startTime);
+                myHandler.postDelayed(this, 100);
+            }
+        }
+    };
 
 }

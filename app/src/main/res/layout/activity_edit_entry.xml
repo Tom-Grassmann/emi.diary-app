@@ -1,64 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_edit_entry"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+
     tools:context="emi.diary_app.EditEntryActivity">
 
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <Button
-            android:text="Save Changes"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:id="@+id/btnBack" />
 
-        <EditText
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:ems="10"
-            android:id="@+id/editTitle"
-            android:hint="Titel" />
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:id="@+id/LinearLayoutEditEntry">
 
-        <EditText
-            android:layout_width="match_parent"
-            android:inputType="textMultiLine"
-            android:ems="10"
-            android:id="@+id/editTextContent"
-            android:scrollbars = "vertical"
-            android:gravity="start"
-            android:layout_gravity="center"
-            android:verticalScrollbarPosition="defaultPosition"
-            android:layout_height="160dp"
-            android:hint="Liebes Tagebuch" />
+            <Button
+                android:text="Save Changes"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:id="@+id/btnBack" />
 
-        <ImageButton
-            android:layout_width="match_parent"
-            app:srcCompat="@android:drawable/ic_menu_report_image"
-            android:id="@+id/imageButton"
-            android:scaleType="fitCenter"
-            android:layout_height="150dp" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/editTitle"
+                android:hint="Füge einen Titel hinzu..." />
 
-        <Button
-            android:text="Play"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:id="@+id/btnPlayAudio" />
+            <EditText
+                android:layout_width="match_parent"
+                android:inputType="textMultiLine"
+                android:ems="10"
+                android:id="@+id/editTextContent"
+                android:scrollbars = "vertical"
+                android:gravity="start"
+                android:layout_gravity="center"
+                android:verticalScrollbarPosition="defaultPosition"
+                android:layout_height="160dp"
+                android:hint="Liebes Tagebuch..." />
 
-        <Button
-            android:text="Record"
+            <ImageButton
+                android:layout_width="match_parent"
+                app:srcCompat="@android:drawable/ic_menu_report_image"
+                android:id="@+id/imageButton"
+                android:scaleType="fitCenter"
+                android:visibility="invisible"
+                android:layout_height="150dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:id="@+id/btnRecordAudio" />
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_blue_dark"
+            android:layout_weight="7"
+            android:id="@+id/toolBar">
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="20" />
+
+            <ImageButton
+                android:id="@+id/btnAddPicture"
+                android:layout_width="match_parent"
+                android:textSize="60sp"
+                android:textStyle="normal|bold"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_picture_add"
+                style="@android:style/Widget.Holo.Light.ActionButton"
+                android:maxHeight="50dp"
+                android:scaleX="1.8"
+                android:scaleY="1.8"
+                android:layout_weight="0.5"
+                android:layout_height="70dp" />
+
+            <ImageButton
+                android:id="@+id/btnRecordAudio"
+                android:layout_width="match_parent"
+                android:minHeight="0dp"
+                style="@android:style/Widget.Holo.Light.ActionButton"
+                app:srcCompat="@drawable/ic_microfphone"
+                android:scaleType="fitCenter"
+                android:layout_height="70dp"
+                android:textSize="50sp"
+                android:textStyle="normal|bold"
+                android:layout_below="@+id/btnShare"
+                android:scaleX="1.6"
+                android:scaleY="1.6"
+                android:elevation="1dp"
+                android:layout_weight="0.5"
+                android:maxHeight="40dp" />
+
+
+        </LinearLayout>
+
     </LinearLayout>
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

@@ -4,31 +4,23 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.media.MediaPlayer;
-import android.support.v7.app.AppCompatActivity;
-import android.text.AndroidCharacter;
-import android.util.Log;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.os.Handler;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -252,10 +244,7 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
         ImageView imageContent = (ImageView) imageEntry.findViewById(R.id.imageContent);
         if (!note.getImageNote().equals("")) {
 
-            /* Decode Image from path */
-            Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
-
-            imageContent.setImageBitmap(image);
+            imageContent.setImageBitmap(note.getBitmap());
             imageContent.setMaxHeight(350);
         }
 
@@ -268,7 +257,7 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
         entryImage.addView(imageEntry);
 
 
-        Button btnEntryMenu = (Button) entry.findViewById(R.id.btnEntryMenu);
+        ImageButton btnEntryMenu = (ImageButton) entry.findViewById(R.id.btnEntryMenu);
 
         btnEntryMenu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -331,12 +320,9 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
 
         return entry;
-
-
     }
 
     private double startTime = 0;
-    private double finalTime = 0;
 
     private Handler myHandler = new Handler();;
 
@@ -356,7 +342,7 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                                         toMinutes((long) startTime)))
                 );
 
-                playerSeekBar.setProgress((int)startTime, true);
+                playerSeekBar.setProgress((int)startTime);
                 myHandler.postDelayed(this, 100);
             }
         }

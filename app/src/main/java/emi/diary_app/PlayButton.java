@@ -2,11 +2,12 @@ package emi.diary_app;
 
 import android.content.Context;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 
 enum PlayState {
 
-    STOPPED, PLAYING, PAUSED;
+    STOPPED, PLAYING, PAUSED
 }
 
 public class PlayButton extends Button {

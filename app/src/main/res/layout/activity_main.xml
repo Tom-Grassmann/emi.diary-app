@@ -2,61 +2,22 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:fitsSystemWindows="true"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context="emi.diary_app.MainActivity">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView"
-        android:visibility="invisible" />
-
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
-
-        <android.support.design.widget.AppBarLayout android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:theme="@style/AppTheme.AppBarOverlay"
-            android:background="@android:color/holo_blue_dark"
-            android:id="@+id/appBar">
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <Button
-                    android:text="Edit"
-                    android:layout_width="wrap_content"
-                    android:id="@+id/btnEdit"
-                    android:layout_weight="1"
-                    android:minHeight="0dp"
-                    style="@android:style/Widget.Holo.Light.ActionButton"
-                    android:layout_height="45dp"
-                    android:textSize="22sp"
-                    android:textStyle="normal|bold"/>
-
-                <Button
-                    android:text="Add"
-                    android:id="@+id/btnAdd"
-                    android:layout_weight="1"
-                    android:layout_width="wrap_content"
-                    android:minHeight="0dp"
-                    style="@android:style/Widget.Holo.Light.ActionButton"
-                    android:layout_height="45dp"
-                    android:textSize="22sp"
-                    android:textStyle="normal|bold" />
-
-            </LinearLayout>
-
-        </android.support.design.widget.AppBarLayout>
 
         <ListView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:alwaysDrawnWithCache="true"
             android:layout_below="@+id/appBar"
             android:id="@+id/tableDisplayEntry"
@@ -67,6 +28,52 @@
 
         </ListView>
 
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_blue_dark"
+            android:layout_weight="7">
 
-    </RelativeLayout>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="20" />
+
+            <ImageButton
+                android:id="@+id/btnShare"
+                android:layout_width="match_parent"
+                android:textSize="60sp"
+                android:textStyle="normal|bold"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_share"
+                style="@android:style/Widget.Holo.Light.ActionButton"
+                android:maxHeight="50dp"
+                android:scaleX="1.8"
+                android:scaleY="1.8"
+                android:layout_weight="0.5"
+                android:layout_height="70dp" />
+
+            <ImageButton
+                android:id="@+id/btnAdd"
+                android:layout_width="match_parent"
+                android:minHeight="0dp"
+                style="@android:style/Widget.Holo.Light.ActionButton"
+                app:srcCompat="@drawable/ic_plus"
+                android:scaleType="fitCenter"
+                android:layout_height="70dp"
+                android:textSize="50sp"
+                android:textStyle="normal|bold"
+                android:layout_below="@+id/btnShare"
+                android:scaleX="1.6"
+                android:scaleY="1.6"
+                android:elevation="1dp"
+                android:layout_weight="0.5"
+                android:maxHeight="40dp" />
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
 </android.support.design.widget.CoordinatorLayout>

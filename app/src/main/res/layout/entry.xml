@@ -26,13 +26,18 @@
             android:textStyle="normal|bold"
             android:layout_weight="1"/>
 
-        <Button
-            android:layout_height="50dp"
+        <ImageButton
             android:id="@+id/btnEntryMenu"
             android:layout_weight="1"
-            android:layout_width="50dp"
-            android:background="@android:drawable/ic_menu_sort_by_size"
-            android:elevation="0dp" />
+            app:srcCompat="@drawable/ic_menu"
+            android:scaleType="fitCenter"
+            style="@android:style/Widget.Holo.Light.ActionButton"
+
+            android:elevation="0dp"
+            android:layout_width="80dp"
+            android:scaleX="2"
+            android:scaleY="2"
+            android:layout_height="40dp" />
 
     </LinearLayout>
 
@@ -79,6 +84,7 @@
             android:textColor="#999999"
             android:textIsSelectable="false"
             android:textAlignment="textEnd"
+            android:layout_gravity="end"
             android:id="@+id/tvDate" />
     </LinearLayout>
 </LinearLayout>

@@ -44,7 +44,9 @@ public class TableManager implements Serializable{
             note.setVoiceNote(data.getString(4));
             note.setImageNote(data.getString(5));
 
-
+            /* Decode Image from path */
+            Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
+            note.setBitmap(image);
 
             this.arrayList.add(note);
         }

@@ -17,12 +17,14 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
     protected long timestamp;
     protected String title;
 
-    protected SeekBar seekBar;
+    protected transient SeekBar seekBar;
     protected int lastPlayedDuration;
 
     protected String text_note = "";
     protected String voice_note_path = "";
     protected String image_note_path = "";
+
+    protected transient Bitmap bitmap = null;
 
     protected NoteType noteType;
 
@@ -166,7 +168,6 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
         if (this.timestamp < note.getTimestamp()) { return 1; }
         if (this.timestamp > note.getTimestamp()) {return -1; }
         else return 0;
-
     }
 
 
@@ -184,5 +185,13 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
 
     public void setLastPlayedDuration(int lastPlayedDuration) {
         this.lastPlayedDuration = lastPlayedDuration;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
     }
 }

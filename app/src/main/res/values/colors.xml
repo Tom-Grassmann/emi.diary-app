@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#3F51B5</color>
+    <color name="colorMenuBar">#6680cbc4</color>
     <color name="colorPrimaryDark">#de000000</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorVoiceEntryBackground">#b3d5ff</color>
+    <color name="colorAppBar">#ff0099cc</color>
 </resources>
