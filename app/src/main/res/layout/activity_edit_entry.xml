@@ -24,19 +24,33 @@
             android:layout_marginRight="5dp"
             android:id="@+id/LinearLayoutEditEntry">
 
-            <Button
-                android:text="Save Changes"
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:id="@+id/btnBack" />
+                android:layout_height="wrap_content">
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:ems="10"
-                android:id="@+id/editTitle"
-                android:hint="Füge einen Titel hinzu..." />
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:ems="10"
+                    android:id="@+id/editTitle"
+                    android:hint="Füge einen Titel hinzu..."
+                    android:layout_weight="1" />
+
+                <ImageButton
+                    android:id="@+id/btnDeleteText"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/ic_delete"
+                    style="@android:style/Widget.Holo.Light.ActionButton"
+                    android:maxHeight="50dp"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    android:layout_weight="7"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent" />
+
+            </LinearLayout>
 
             <EditText
                 android:layout_width="match_parent"
@@ -47,8 +61,8 @@
                 android:gravity="start"
                 android:layout_gravity="center"
                 android:verticalScrollbarPosition="defaultPosition"
-                android:layout_height="160dp"
-                android:hint="Liebes Tagebuch..." />
+                android:hint="Liebes Tagebuch..."
+                android:layout_height="260dp" />
 
             <ImageButton
                 android:layout_width="match_parent"
@@ -56,7 +70,8 @@
                 android:id="@+id/imageButton"
                 android:scaleType="fitCenter"
                 android:visibility="invisible"
-                android:layout_height="150dp" />
+                style="@android:style/Widget.Holo.Light.ImageButton"
+                android:layout_height="0dp" />
 
         </LinearLayout>
 
@@ -64,28 +79,50 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/holo_blue_dark"
+            android:background="@color/colorAppBar"
             android:layout_weight="7"
             android:id="@+id/toolBar">
 
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="20" />
+                android:layout_weight="100" />
+
+            <ImageButton
+                android:id="@+id/btnSaveEntry"
+                android:layout_width="match_parent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_save"
+                style="@android:style/Widget.Holo.Light.ActionButton"
+                android:maxHeight="50dp"
+                android:scaleX="1.7"
+                android:scaleY="1.7"
+                android:layout_weight="0.1"
+                android:layout_height="60dp" />
+
+            <ImageButton
+                android:id="@+id/btnTakePicture"
+                android:layout_width="match_parent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_camery"
+                style="@android:style/Widget.Holo.Light.ActionButton"
+                android:maxHeight="50dp"
+                android:scaleX="2"
+                android:scaleY="2"
+                android:layout_weight="0.1"
+                android:layout_height="60dp" />
 
             <ImageButton
                 android:id="@+id/btnAddPicture"
                 android:layout_width="match_parent"
-                android:textSize="60sp"
-                android:textStyle="normal|bold"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_picture_add"
                 style="@android:style/Widget.Holo.Light.ActionButton"
                 android:maxHeight="50dp"
                 android:scaleX="1.8"
                 android:scaleY="1.8"
-                android:layout_weight="0.5"
-                android:layout_height="70dp" />
+                android:layout_weight="0.1"
+                android:layout_height="60dp" />
 
             <ImageButton
                 android:id="@+id/btnRecordAudio"
@@ -94,15 +131,14 @@
                 style="@android:style/Widget.Holo.Light.ActionButton"
                 app:srcCompat="@drawable/ic_microfphone"
                 android:scaleType="fitCenter"
-                android:layout_height="70dp"
-                android:textSize="50sp"
-                android:textStyle="normal|bold"
                 android:layout_below="@+id/btnShare"
-                android:scaleX="1.6"
-                android:scaleY="1.6"
+                android:scaleX="1.8"
+                android:scaleY="1.8"
                 android:elevation="1dp"
-                android:layout_weight="0.5"
-                android:maxHeight="40dp" />
+                android:layout_weight="0.1"
+                android:maxHeight="40dp"
+                android:layout_height="60dp"
+                android:layout_marginBottom="10dp" />
 
 
         </LinearLayout>

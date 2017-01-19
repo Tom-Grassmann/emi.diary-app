@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.io.Serializable;
@@ -56,6 +58,17 @@ public class TableManager implements Serializable{
         this.adapter = new EntryAdapter(this.context, this.arrayList, this);
         this.table.setAdapter(this.adapter);
 
+
+        this.table.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                System.out.println("TEST");
+
+
+                return false;
+            }
+        });
     }
 
     public void addEntry(Note note) throws NullPointerException {

@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -46,9 +47,8 @@ import java.util.concurrent.TimeUnit;
 public class EditEntryActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE = 2;
+    static final int REQUEST_IMAGE_CAPTURE = 3;
 
-    private Button
-            btnBack;
 
     private EditText
             editTitle,
@@ -58,12 +58,16 @@ public class EditEntryActivity extends AppCompatActivity {
             note;
 
     private ImageButton
+            btnSaveEntry,
             imageButton,
             btnAddPicture,
-            btnRecordAudio;
+            btnRecordAudio,
+            btnTakePicture;
 
 
     private boolean RECORDING = false;
+    private boolean AUDIOPLAYER_VISIBLE = false;
+    private boolean AUDIO_PLAYING = false;
 
 
     private File audioFile = null;
@@ -99,21 +103,30 @@ public class EditEntryActivity extends AppCompatActivity {
 
     public void InitializeActivity() {
 
-        btnBack = (Button) findViewById(R.id.btnBack);
+        btnSaveEntry = (ImageButton) findViewById(R.id.btnSaveEntry);
         btnRecordAudio = (ImageButton) findViewById(R.id.btnRecordAudio);
+        btnTakePicture = (ImageButton) findViewById(R.id.btnTakePicture);
 
 
         editTitle = (EditText) findViewById(R.id.editTitle);
         editTextContent = (EditText) findViewById(R.id.editTextContent);
 
         imageButton = (ImageButton) findViewById(R.id.imageButton);
+        btnAddPicture = (ImageButton) findViewById(R.id.btnAddPicture);
 
 
         /* Load Image when existing */
         if (!note.getImageNote().equals("")) {
 
+            btnAddPicture.setVisibility(View.INVISIBLE);
+            // TODO: Make sure that Buttons of Toolbar stay in place
+
             Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
             imageButton.setImageBitmap(image);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500);
+            imageButton.setLayoutParams(params);
+            imageButton.setVisibility(View.VISIBLE);
+
         }
 
         if (REQUEST_CODE == EDIT_ENTRY) {
@@ -133,7 +146,7 @@ public class EditEntryActivity extends AppCompatActivity {
 
 
 
-        btnBack.setOnClickListener(new View.OnClickListener() {
+        btnSaveEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -154,18 +167,37 @@ public class EditEntryActivity extends AppCompatActivity {
             }
         });
 
+        btnAddPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+
+                /* Start Activity to Choose Picture from Gallery */
+                Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                getIntent.setType("image/*");
+                Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                pickIntent.setType("image/*");
+                Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
+
+
+                startActivityForResult(chooserIntent, PICK_IMAGE);
+            }
+        });
+
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                /* Start Activity to Choose Picture from Gallery */
                 Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 getIntent.setType("image/*");
-
                 Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 pickIntent.setType("image/*");
-
                 Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
                 chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
+
 
                 startActivityForResult(chooserIntent, PICK_IMAGE);
             }
@@ -221,6 +253,18 @@ public class EditEntryActivity extends AppCompatActivity {
             }
         });
 
+        btnTakePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                }
+
+            }
+        });
+
     }
 
     void startRecord() throws Exception {
@@ -270,6 +314,8 @@ public class EditEntryActivity extends AppCompatActivity {
         mediaRecorder.reset();
         mediaRecorder.release();
         mediaRecorder = null;
+
+        note.setVoiceNote(audioFile.getPath());
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -298,7 +344,18 @@ public class EditEntryActivity extends AppCompatActivity {
                     File internalStorage = this.getDir("Pictures", Context.MODE_PRIVATE);
                     File reportFilePath = new File(internalStorage, note.getID() + ".png");
                     note.setImageNote(reportFilePath.toString());
-                    System.out.println(note.getImageNote());
+
+                    /* Make ImageButton visivle */
+                    imageButton.setVisibility(View.VISIBLE);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500);
+                    imageButton.setLayoutParams(params);
+
+                    /* Make AddPicture Button in Toolbar invisible */
+                    btnAddPicture.setVisibility(View.INVISIBLE);
+                    btnAddPicture.setEnabled(false);
+                    LinearLayout linLay = (LinearLayout) findViewById(R.id.toolBar);
+                    linLay.removeView(btnAddPicture);
+                    linLay.addView(btnAddPicture, 1);
 
                     FileOutputStream fos = null;
                     try {
@@ -312,112 +369,164 @@ public class EditEntryActivity extends AppCompatActivity {
                 }
             }
         }
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+
+
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            imageButton.setImageBitmap(imageBitmap);
+
+
+            /* Make ImageButton visivle */
+            imageButton.setVisibility(View.VISIBLE);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500);
+            imageButton.setLayoutParams(params);
+
+            /* Make AddPhoto and AddImage button Invisible */
+            // TODO: Make invisible
+
+            /* Set Bitmap and ImagePath to Note */
+            note.setBitmap(imageBitmap);
+
+            /* Write Image to internal Storage and extract the Path of it */
+            String picturePath = "";
+            if (note.getImageNote() != null) {
+
+                File internalStorage = this.getDir("Pictures", Context.MODE_PRIVATE);
+                File reportFilePath = new File(internalStorage, note.getID() + ".png");
+                picturePath = reportFilePath.toString();
+
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(reportFilePath);
+                    note.getBitmap().compress(Bitmap.CompressFormat.PNG, 100 , fos);
+                    fos.close();
+                }
+                catch (Exception ex) {
+                    Log.i("EditEntry", "Problem writing Image from Camera to External Storage", ex);
+                    picturePath = "";
+                }
+
+                /* Set PicturePath to Note */
+                note.setImageNote(picturePath);
+            }
+        }
+
     }
 
     private void createAudioPlayer() {
 
-            /* Create View to Play Audio */
-            View voiceEntry = View.inflate(this, R.layout.diary_entry_voice, null);
+        /* Create View to Play Audio */
+        View voiceEntry = View.inflate(this, R.layout.diary_entry_voice, null);
 
-                 /* - - - Set up PlayButton - - - - - - - - - - - - - - - - - - - - - - - */
-            final PlayButton playVoiceContent = new PlayButton(this);
-            playVoiceContent.setBackground(this.getResources().getDrawable(R.drawable.ic_media_play));
+             /* - - - Set up PlayButton - - - - - - - - - - - - - - - - - - - - - - - */
+        final PlayButton playVoiceContent = new PlayButton(this);
+        playVoiceContent.setBackground(this.getResources().getDrawable(R.drawable.ic_media_play));
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150, 150);
-            params.setMargins(5, 0, 0, 0);
-            params.height = 110;
-            params.width = 110;
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150, 150);
+        params.setMargins(5, 0, 0, 0);
+        params.height = 110;
+        params.width = 110;
 
-            playVoiceContent.setLayoutParams(params);
+        playVoiceContent.setLayoutParams(params);
 
-                /* Add Button to Linear Layout */
-            LinearLayout linearLayout = (LinearLayout) voiceEntry.findViewById(R.id.voiceEntryLinLay);
-            linearLayout.addView(playVoiceContent, 0);
-                /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+            /* Add Button to Linear Layout */
+        LinearLayout linearLayout = (LinearLayout) voiceEntry.findViewById(R.id.voiceEntryLinLay);
+        params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.setMargins(5, 10, 5, 10);
+        linearLayout.setLayoutParams(params);
+        linearLayout.addView(playVoiceContent, 0);
+            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-            playerSeekBar = (SeekBar) voiceEntry.findViewById(R.id.playerProgressBar);
+        playerSeekBar = (SeekBar) voiceEntry.findViewById(R.id.playerProgressBar);
 
-            playVoiceContent.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+        playVoiceContent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
-                    /* If Audio is playing */
-                if (playVoiceContent.state == PlayState.PLAYING) {
+                /* If Audio is playing */
+            if (playVoiceContent.state == PlayState.PLAYING) {
 
-                        /* Set up "Pause" Icon */
-                    playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+                    /* Set up "Pause" Icon */
+                playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
 
-                        /* Pause Audio */
-                    mediaPlayer.pause();
+                    /* Pause Audio */
+                mediaPlayer.pause();
 
-                    playVoiceContent.setPaused();
+                playVoiceContent.setPaused();
 
-                     /* If Audio is stopped */
-                } else if (playVoiceContent.state == PlayState.STOPPED){
+                 /* If Audio is stopped */
+            } else if (playVoiceContent.state == PlayState.STOPPED){
 
-                        /* Set up "Play" Icon */
-                    playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
-
-
-                        /* - - - Preparing MediaPlayer - - - - - - - - - - - - - - - - - - - - - */
-                    mediaPlayer = new MediaPlayer();
-                    try {
-                        mediaPlayer.setDataSource(note.getVoiceNote());
-                        mediaPlayer.prepare();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                        /* Set OnCompletitionListener to MediaPlayer */
-                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mediaPlayer) {
-
-                                /* Re-Preparing MediaPlayer */
-                            mediaPlayer.stop();
-                            mediaPlayer.reset();
-                            mediaPlayer.release();
-
-                                /* Set State of PlayButton to "Stopped" */
-                            playVoiceContent.setStopped();
-
-                                /* Stop SeekBar-Updation */
-                            playerSeekBar.setProgress(0);
-
-                                /* Set up "Pause" Icon */
-                            playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
-                        }
-                    });
-
-                        /* Start Audio */
-                    mediaPlayer.start();
+                    /* Set up "Play" Icon */
+                playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
 
 
-                        /* SeekBar updation */
-                    playerSeekBar.setMax(mediaPlayer.getDuration());
-                    playerSeekBar.setProgress((int)startTime);
-                    myHandler.postDelayed(UpdateSongTime,100);
-
-                        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-
-                    playVoiceContent.setPlaying();
-
-                    /* If Audio is paused */
-                } else if (playVoiceContent.state == PlayState.PAUSED) {
-
-                        /* Set up "Play" Icon */
-                    playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
-
-                    mediaPlayer.start();
-
-                        /* SeekBar updation */
-                    playerSeekBar.setMax(mediaPlayer.getDuration());
-                    playerSeekBar.setProgress((int)startTime);
-                    myHandler.postDelayed(UpdateSongTime,100);
-
-                    playVoiceContent.setPlaying();
+                    /* - - - Preparing MediaPlayer - - - - - - - - - - - - - - - - - - - - - */
+                mediaPlayer = new MediaPlayer();
+                try {
+                    mediaPlayer.setDataSource(note.getVoiceNote());
+                    mediaPlayer.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+
+                    /* Set OnCompletitionListener to MediaPlayer */
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+
+                        AUDIO_PLAYING = false;
+
+
+                            /* Re-Preparing MediaPlayer */
+                        mediaPlayer.stop();
+                        mediaPlayer.reset();
+                        mediaPlayer.release();
+
+                            /* Set State of PlayButton to "Stopped" */
+                        playVoiceContent.setStopped();
+
+                            /* Stop SeekBar-Updation */
+                        playerSeekBar.setProgress(0);
+
+                            /* Set up "Pause" Icon */
+                        playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+                    }
+                });
+
+                    /* Start Audio */
+                mediaPlayer.start();
+
+                AUDIO_PLAYING = true;
+
+
+                    /* SeekBar updation */
+                playerSeekBar.setMax(mediaPlayer.getDuration());
+                playerSeekBar.setProgress((int)startTime);
+                myHandler.postDelayed(UpdateSongTime,100);
+
+                    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+                playVoiceContent.setPlaying();
+
+                /* If Audio is paused */
+            } else if (playVoiceContent.state == PlayState.PAUSED) {
+
+                    /* Set up "Play" Icon */
+                playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
+
+                mediaPlayer.start();
+
+                    /* SeekBar updation */
+                playerSeekBar.setMax(mediaPlayer.getDuration());
+                playerSeekBar.setProgress((int)startTime);
+                myHandler.postDelayed(UpdateSongTime,100);
+
+                playVoiceContent.setPlaying();
+            }
             }
         });
 
@@ -425,14 +534,16 @@ public class EditEntryActivity extends AppCompatActivity {
         LinearLayout linearLayoutActivity = (LinearLayout) findViewById(R.id.LinearLayoutEditEntry);
 
         /* If there is an Audio Player */
-        if (linearLayoutActivity.getChildCount() < 5) {
+        if (AUDIOPLAYER_VISIBLE) {
 
             /* Remove it */
-            linearLayoutActivity.removeViewAt(4);
+            linearLayoutActivity.removeViewAt(3);
 
         }
         /* Adding View to LinearLayout from Activity */
-        linearLayoutActivity.addView(voiceEntry, 4);
+        linearLayoutActivity.addView(voiceEntry, 3);
+
+        AUDIOPLAYER_VISIBLE = true;
 
     }
 
@@ -444,7 +555,7 @@ public class EditEntryActivity extends AppCompatActivity {
     private Runnable UpdateSongTime = new Runnable() {
         public void run() {
 
-            if (true) {
+            if (AUDIO_PLAYING) {
 
                 startTime = mediaPlayer.getCurrentPosition();
 
@@ -459,6 +570,7 @@ public class EditEntryActivity extends AppCompatActivity {
 
                 playerSeekBar.setProgress((int)startTime);
                 myHandler.postDelayed(this, 100);
+
             }
         }
     };

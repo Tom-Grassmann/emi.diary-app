@@ -32,7 +32,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/holo_blue_dark"
+            android:background="@color/colorAppBar"
             android:layout_weight="7">
 
             <Space
@@ -52,7 +52,9 @@
                 android:scaleX="1.8"
                 android:scaleY="1.8"
                 android:layout_weight="0.5"
-                android:layout_height="70dp" />
+                android:layout_height="70dp"
+                android:visibility="invisible"
+                android:saveEnabled="false" />
 
             <ImageButton
                 android:id="@+id/btnAdd"
