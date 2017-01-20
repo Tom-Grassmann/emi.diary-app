@@ -15,65 +15,118 @@
         android:layout_height="match_parent">
 
 
-        <LinearLayout
-            android:orientation="vertical"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:id="@+id/LinearLayoutEditEntry">
+            android:layout_weight="1">
 
             <LinearLayout
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:id="@+id/LinearLayoutEditEntry">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:ems="10"
+                        android:id="@+id/editTitle"
+                        android:hint="Füge einen Titel hinzu..."
+                        android:layout_weight="1"
+                        style="@android:style/Widget.Holo.Light.EditText" />
+
+                    <ImageButton
+                        android:id="@+id/btnDeleteText"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/ic_delete"
+                        style="@android:style/Widget.Holo.Light.ActionButton"
+                        android:maxHeight="50dp"
+                        android:scaleX="1.5"
+                        android:scaleY="1.5"
+                        android:layout_weight="9"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp" />
+
+                </LinearLayout>
 
                 <EditText
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
+                    android:inputType="textMultiLine"
                     android:ems="10"
-                    android:id="@+id/editTitle"
-                    android:hint="Füge einen Titel hinzu..."
-                    android:layout_weight="1" />
+                    android:id="@+id/editTextContent"
+                    android:scrollbars = "vertical"
+                    android:gravity="start"
+                    android:layout_gravity="center"
+                    android:verticalScrollbarPosition="defaultPosition"
+                    android:hint="Liebes Tagebuch..."
+                    android:layout_height="wrap_content"
+                    style="@android:style/Widget.Holo.Light.EditText"
+                    android:minHeight="250dp" />
 
-                <ImageButton
-                    android:id="@+id/btnDeleteText"
-                    android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/ic_delete"
-                    style="@android:style/Widget.Holo.Light.ActionButton"
-                    android:maxHeight="50dp"
-                    android:scaleX="0.8"
-                    android:scaleY="0.8"
-                    android:layout_weight="7"
-                    android:layout_height="match_parent"
-                    android:layout_width="match_parent" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        app:srcCompat="@android:drawable/ic_menu_report_image"
+                        android:id="@+id/imageView"
+                        android:scaleType="fitCenter"
+                        android:visibility="invisible"
+                        android:layout_weight="1"
+                        android:layout_height="0dp" />
+
+                    <ImageButton
+                        android:id="@+id/btnDeletePicture"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/ic_delete"
+                        style="@android:style/Widget.Holo.Light.ActionButton"
+                        android:maxHeight="50dp"
+                        android:scaleX="1.5"
+                        android:scaleY="1.5"
+                        android:layout_weight="9"
+                        android:layout_height="45dp"
+                        android:layout_width="match_parent" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/LinLayAudioPlayer">
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                    <ImageButton
+                        android:id="@+id/btnDeleteAudio"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/ic_delete"
+                        style="@android:style/Widget.Holo.Light.ActionButton"
+                        android:maxHeight="50dp"
+                        android:scaleX="1.5"
+                        android:scaleY="1.5"
+                        android:layout_weight="9"
+                        android:layout_height="45dp"
+                        android:layout_width="match_parent" />
+
+                </LinearLayout>
 
             </LinearLayout>
-
-            <EditText
-                android:layout_width="match_parent"
-                android:inputType="textMultiLine"
-                android:ems="10"
-                android:id="@+id/editTextContent"
-                android:scrollbars = "vertical"
-                android:gravity="start"
-                android:layout_gravity="center"
-                android:verticalScrollbarPosition="defaultPosition"
-                android:hint="Liebes Tagebuch..."
-                android:layout_height="260dp" />
-
-            <ImageButton
-                android:layout_width="match_parent"
-                app:srcCompat="@android:drawable/ic_menu_report_image"
-                android:id="@+id/imageButton"
-                android:scaleType="fitCenter"
-                android:visibility="invisible"
-                style="@android:style/Widget.Holo.Light.ImageButton"
-                android:layout_height="0dp" />
-
-        </LinearLayout>
+        </ScrollView>
 
         <LinearLayout
             android:orientation="vertical"

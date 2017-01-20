@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,6 +86,7 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
         View textEntry = View.inflate(context, R.layout.diary_entry_text, null);
         TextView textContent = (TextView) textEntry.findViewById(R.id.textContent);
         textContent.setText(note.getTextNote());
+        textContent.setMaxHeight(300);
 
         /* Setting up VoiceEntry */
         View voiceEntry = null;
@@ -95,11 +97,10 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
             /* - - - Set up PlayButton - - - - - - - - - - - - - - - - - - - - - - - */
             final PlayButton playVoiceContent = new PlayButton(context);
             playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
+            playVoiceContent.setGravity(Gravity.CENTER_VERTICAL);
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150, 150);
-            params.setMargins(5, 0, 0, 0);
-            params.height = 110;
-            params.width = 110;
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(80, 80);
+            params.setMargins(15, 15, 0, 15);
 
             playVoiceContent.setLayoutParams(params);
 

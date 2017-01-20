@@ -1,7 +1,9 @@
 package emi.diary_app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -59,10 +61,21 @@ public class EditEntryActivity extends AppCompatActivity {
 
     private ImageButton
             btnSaveEntry,
-            imageButton,
             btnAddPicture,
             btnRecordAudio,
-            btnTakePicture;
+            btnTakePicture,
+            btnDeleteText,
+            btnDeletePicture,
+            btnDeleteAudio;
+
+    private ImageView
+            imageView;
+
+    private View.OnClickListener
+            clickerDeleteText,
+            clickerDeletePicture,
+            clickerDeleteAudio;
+
 
 
     private boolean RECORDING = false;
@@ -103,29 +116,26 @@ public class EditEntryActivity extends AppCompatActivity {
 
     public void InitializeActivity() {
 
-        btnSaveEntry = (ImageButton) findViewById(R.id.btnSaveEntry);
-        btnRecordAudio = (ImageButton) findViewById(R.id.btnRecordAudio);
-        btnTakePicture = (ImageButton) findViewById(R.id.btnTakePicture);
-
-
-        editTitle = (EditText) findViewById(R.id.editTitle);
-        editTextContent = (EditText) findViewById(R.id.editTextContent);
-
-        imageButton = (ImageButton) findViewById(R.id.imageButton);
-        btnAddPicture = (ImageButton) findViewById(R.id.btnAddPicture);
+        /* Initialize Views */
+        initViews();
 
 
         /* Load Image when existing */
         if (!note.getImageNote().equals("")) {
 
-            btnAddPicture.setVisibility(View.INVISIBLE);
-            // TODO: Make sure that Buttons of Toolbar stay in place
-
+            /* Set up ImageView */
             Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
-            imageButton.setImageBitmap(image);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500);
-            imageButton.setLayoutParams(params);
-            imageButton.setVisibility(View.VISIBLE);
+            imageView.setImageBitmap(image);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, image.getHeight(), 1);
+            imageView.setLayoutParams(params);
+            imageView.setMaxHeight(500);
+            imageView.setVisibility(View.VISIBLE);
+
+            /* Set up DeleteButton for Picture */
+            btnDeletePicture.setVisibility(View.VISIBLE);
+
+            btnDeletePicture.setOnClickListener(clickerDeletePicture);
+
 
         }
 
@@ -159,6 +169,39 @@ public class EditEntryActivity extends AppCompatActivity {
                     note.setVoiceNote(audioFile.getPath());
                 }
 
+
+                /* Save Picture to Note and ExternalStorage */
+                if (note.getBitmap() != null) {
+
+                    String picturePath = "";
+
+                    File internalStorage = getDir("Pictures", Context.MODE_PRIVATE);
+                    File reportFilePath = new File(internalStorage, note.getID() + ".png");
+                    picturePath = reportFilePath.toString();
+
+                    FileOutputStream fos = null;
+                    try {
+                        fos = new FileOutputStream(reportFilePath);
+                        note.getBitmap().compress(Bitmap.CompressFormat.PNG, 100 , fos);
+                        fos.close();
+                    }
+                    catch (Exception ex) {
+                        Log.i("EditEntry", "Problem writing Image from Camera to External Storage", ex);
+                        picturePath = "";
+                    }
+
+                    /* Set PicturePath to Note */
+                    note.setImageNote(picturePath);
+
+                /* Delete Picture if there is no Bitmap */
+                } else {
+
+                    File image = new File(note.getImageNote());
+                    image.delete();
+
+                    note.setImageNote("");
+                }
+
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("note", note);
                 setResult(Activity.RESULT_OK, resultIntent);
@@ -186,7 +229,7 @@ public class EditEntryActivity extends AppCompatActivity {
             }
         });
 
-        imageButton.setOnClickListener(new View.OnClickListener() {
+        imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -304,9 +347,7 @@ public class EditEntryActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-
 
     void stopRecord() {
 
@@ -335,84 +376,46 @@ public class EditEntryActivity extends AppCompatActivity {
                 String picturePath = cursor.getString(columnIndex);
                 cursor.close();
 
-                imageButton.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-                imageButton.setMaxHeight(500);
+                /* Decode the Bitmap */
+                Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
 
-                /* Write Image to internal Storage and extract the Path of it */
-                if (BitmapFactory.decodeFile(picturePath) != null) {
+                imageView.setImageBitmap(bitmap);
+                imageView.setMaxHeight(500);
 
-                    File internalStorage = this.getDir("Pictures", Context.MODE_PRIVATE);
-                    File reportFilePath = new File(internalStorage, note.getID() + ".png");
-                    note.setImageNote(reportFilePath.toString());
+                /* Set Bitmap to Note */
+                note.setBitmap(bitmap);
 
-                    /* Make ImageButton visivle */
-                    imageButton.setVisibility(View.VISIBLE);
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500);
-                    imageButton.setLayoutParams(params);
+                /* Make imageView visivle */
+                imageView.setVisibility(View.VISIBLE);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, bitmap.getHeight(), 1);
+                imageView.setLayoutParams(params);
+                imageView.setMaxHeight(500);
 
-                    /* Make AddPicture Button in Toolbar invisible */
-                    btnAddPicture.setVisibility(View.INVISIBLE);
-                    btnAddPicture.setEnabled(false);
-                    LinearLayout linLay = (LinearLayout) findViewById(R.id.toolBar);
-                    linLay.removeView(btnAddPicture);
-                    linLay.addView(btnAddPicture, 1);
-
-                    FileOutputStream fos = null;
-                    try {
-                        fos = new FileOutputStream(reportFilePath);
-                        BitmapFactory.decodeFile(picturePath).compress(Bitmap.CompressFormat.PNG, 100, fos);
-                        fos.close();
-                    } catch (Exception ex) {
-                        Log.i("EditEntryActivity", "Problem save picture", ex);
-                        note.setImageNote("");
-                    }
-                }
+                /* Set up DeleteButton for Picture */
+                btnDeletePicture.setVisibility(View.VISIBLE);
+                btnDeletePicture.setOnClickListener(clickerDeletePicture);
             }
         }
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
-
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-            imageButton.setImageBitmap(imageBitmap);
+            imageView.setImageBitmap(imageBitmap);
 
+            /* Make imageView visivle */
+            imageView.setVisibility(View.VISIBLE);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, imageBitmap.getHeight(), 1);
+            imageView.setLayoutParams(params);
+            imageView.setMaxHeight(500);
 
-            /* Make ImageButton visivle */
-            imageButton.setVisibility(View.VISIBLE);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500);
-            imageButton.setLayoutParams(params);
-
-            /* Make AddPhoto and AddImage button Invisible */
-            // TODO: Make invisible
+            /* Set up DeleteButton for Picture */
+            btnDeletePicture.setVisibility(View.VISIBLE);
+            btnDeletePicture.setOnClickListener(clickerDeletePicture);
 
             /* Set Bitmap and ImagePath to Note */
             note.setBitmap(imageBitmap);
-
-            /* Write Image to internal Storage and extract the Path of it */
-            String picturePath = "";
-            if (note.getImageNote() != null) {
-
-                File internalStorage = this.getDir("Pictures", Context.MODE_PRIVATE);
-                File reportFilePath = new File(internalStorage, note.getID() + ".png");
-                picturePath = reportFilePath.toString();
-
-                FileOutputStream fos = null;
-                try {
-                    fos = new FileOutputStream(reportFilePath);
-                    note.getBitmap().compress(Bitmap.CompressFormat.PNG, 100 , fos);
-                    fos.close();
-                }
-                catch (Exception ex) {
-                    Log.i("EditEntry", "Problem writing Image from Camera to External Storage", ex);
-                    picturePath = "";
-                }
-
-                /* Set PicturePath to Note */
-                note.setImageNote(picturePath);
-            }
         }
-
     }
 
     private void createAudioPlayer() {
@@ -420,24 +423,22 @@ public class EditEntryActivity extends AppCompatActivity {
         /* Create View to Play Audio */
         View voiceEntry = View.inflate(this, R.layout.diary_entry_voice, null);
 
-             /* - - - Set up PlayButton - - - - - - - - - - - - - - - - - - - - - - - */
+         /* - - - Set up PlayButton - - - - - - - - - - - - - - - - - - - - - - - */
         final PlayButton playVoiceContent = new PlayButton(this);
         playVoiceContent.setBackground(this.getResources().getDrawable(R.drawable.ic_media_play));
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150, 150);
-        params.setMargins(5, 0, 0, 0);
-        params.height = 110;
-        params.width = 110;
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(80, 80);
+        params.setMargins(15, 15, 0, 15);
 
         playVoiceContent.setLayoutParams(params);
 
-            /* Add Button to Linear Layout */
+        /* Add Button to Linear Layout */
         LinearLayout linearLayout = (LinearLayout) voiceEntry.findViewById(R.id.voiceEntryLinLay);
         params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(5, 10, 5, 10);
         linearLayout.setLayoutParams(params);
         linearLayout.addView(playVoiceContent, 0);
-            /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
         playerSeekBar = (SeekBar) voiceEntry.findViewById(R.id.playerProgressBar);
 
@@ -445,25 +446,25 @@ public class EditEntryActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                /* If Audio is playing */
+            /* If Audio is playing */
             if (playVoiceContent.state == PlayState.PLAYING) {
 
-                    /* Set up "Pause" Icon */
+                /* Set up "Pause" Icon */
                 playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
 
-                    /* Pause Audio */
+                /* Pause Audio */
                 mediaPlayer.pause();
 
                 playVoiceContent.setPaused();
 
-                 /* If Audio is stopped */
+             /* If Audio is stopped */
             } else if (playVoiceContent.state == PlayState.STOPPED){
 
-                    /* Set up "Play" Icon */
+                /* Set up "Play" Icon */
                 playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
 
 
-                    /* - - - Preparing MediaPlayer - - - - - - - - - - - - - - - - - - - - - */
+                /* - - - Preparing MediaPlayer - - - - - - - - - - - - - - - - - - - - - */
                 mediaPlayer = new MediaPlayer();
                 try {
                     mediaPlayer.setDataSource(note.getVoiceNote());
@@ -472,7 +473,7 @@ public class EditEntryActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                    /* Set OnCompletitionListener to MediaPlayer */
+                /* Set OnCompletitionListener to MediaPlayer */
                 mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mediaPlayer) {
@@ -480,47 +481,47 @@ public class EditEntryActivity extends AppCompatActivity {
                         AUDIO_PLAYING = false;
 
 
-                            /* Re-Preparing MediaPlayer */
+                        /* Re-Preparing MediaPlayer */
                         mediaPlayer.stop();
                         mediaPlayer.reset();
                         mediaPlayer.release();
 
-                            /* Set State of PlayButton to "Stopped" */
+                        /* Set State of PlayButton to "Stopped" */
                         playVoiceContent.setStopped();
 
-                            /* Stop SeekBar-Updation */
+                        /* Stop SeekBar-Updation */
                         playerSeekBar.setProgress(0);
 
-                            /* Set up "Pause" Icon */
+                        /* Set up "Pause" Icon */
                         playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
                     }
                 });
 
-                    /* Start Audio */
+                /* Start Audio */
                 mediaPlayer.start();
 
                 AUDIO_PLAYING = true;
 
 
-                    /* SeekBar updation */
+                /* SeekBar updation */
                 playerSeekBar.setMax(mediaPlayer.getDuration());
                 playerSeekBar.setProgress((int)startTime);
                 myHandler.postDelayed(UpdateSongTime,100);
 
-                    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
                 playVoiceContent.setPlaying();
 
-                /* If Audio is paused */
+            /* If Audio is paused */
             } else if (playVoiceContent.state == PlayState.PAUSED) {
 
-                    /* Set up "Play" Icon */
+                /* Set up "Play" Icon */
                 playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
 
                 mediaPlayer.start();
 
-                    /* SeekBar updation */
+                /* SeekBar updation */
                 playerSeekBar.setMax(mediaPlayer.getDuration());
                 playerSeekBar.setProgress((int)startTime);
                 myHandler.postDelayed(UpdateSongTime,100);
@@ -531,17 +532,28 @@ public class EditEntryActivity extends AppCompatActivity {
         });
 
 
-        LinearLayout linearLayoutActivity = (LinearLayout) findViewById(R.id.LinearLayoutEditEntry);
+        final LinearLayout linLayAudioPlayer = (LinearLayout) findViewById(R.id.LinLayAudioPlayer);
 
         /* If there is an Audio Player */
         if (AUDIOPLAYER_VISIBLE) {
 
             /* Remove it */
-            linearLayoutActivity.removeViewAt(3);
+            linLayAudioPlayer.removeViewAt(0);
 
         }
+
+        /* Adding LayoutWeight to AudioPlayer */
+        params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+        voiceEntry.setLayoutParams(params);
+
         /* Adding View to LinearLayout from Activity */
-        linearLayoutActivity.addView(voiceEntry, 3);
+        linLayAudioPlayer.removeViewAt(0);
+        linLayAudioPlayer.addView(voiceEntry, 0);
+
+        /* Set up AudioPlayer DeleteButton */
+        btnDeleteAudio.setVisibility(View.VISIBLE);
+        btnDeleteAudio.setOnClickListener(clickerDeleteAudio);
+
 
         AUDIOPLAYER_VISIBLE = true;
 
@@ -574,5 +586,136 @@ public class EditEntryActivity extends AppCompatActivity {
             }
         }
     };
+
+    private void initViews() {
+
+        btnSaveEntry = (ImageButton) findViewById(R.id.btnSaveEntry);
+        btnRecordAudio = (ImageButton) findViewById(R.id.btnRecordAudio);
+        btnTakePicture = (ImageButton) findViewById(R.id.btnTakePicture);
+
+        btnDeleteText = (ImageButton) findViewById(R.id.btnDeleteText);
+        btnDeletePicture = (ImageButton) findViewById(R.id.btnDeletePicture);
+        btnDeleteAudio = (ImageButton) findViewById(R.id.btnDeleteAudio);
+
+        /* Make DeleteButtons invisible */
+        btnDeletePicture.setVisibility(View.INVISIBLE);
+        btnDeleteAudio.setVisibility(View.INVISIBLE);
+
+
+        editTitle = (EditText) findViewById(R.id.editTitle);
+        editTextContent = (EditText) findViewById(R.id.editTextContent);
+
+        imageView = (ImageView) findViewById(R.id.imageView);
+        btnAddPicture = (ImageButton) findViewById(R.id.btnAddPicture);
+
+        /* - - - Set up OnClickListener of Delete Buttons - - - - - - - - - - - */
+
+        /* Delete Text */
+        clickerDeleteText = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                /* Dialog before deleting */
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+
+                                /* In case of Yes Delete Text */
+                                editTextContent.setText("");
+
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(EditEntryActivity.this);
+                builder.setMessage("Text unwiderruflich Löschen?").setPositiveButton("Ja", dialogClickListener)
+                        .setNegativeButton("Nein", dialogClickListener).show();
+            }
+        };
+
+        /* Delete Picture */
+        clickerDeletePicture = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                /* Dialog before deleting */
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+
+                                note.setBitmap(null);
+
+                                imageView.setImageDrawable(null);
+                                imageView.setVisibility(View.INVISIBLE);
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1);
+                                imageView.setLayoutParams(params);
+
+                                btnDeletePicture.setVisibility(View.INVISIBLE);
+
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(EditEntryActivity.this);
+                builder.setMessage("Bild unwiderruflich Löschen?").setPositiveButton("Ja", dialogClickListener)
+                        .setNegativeButton("Nein", dialogClickListener).show();
+            }
+        };
+
+        /* Delete AudioPlayer */
+        clickerDeleteAudio = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                /* Dialog before deleting */
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+
+                                /* In case of Yes Delete Audio */
+                                LinearLayout linLayAudioPlayer = (LinearLayout) findViewById(R.id.LinLayAudioPlayer);
+
+                                linLayAudioPlayer.removeViewAt(0);
+                                note.setVoiceNote("");
+
+                                audioFile.delete();
+
+                                btnDeleteAudio.setVisibility(View.INVISIBLE);
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(EditEntryActivity.this);
+                builder.setMessage("Audiowiedergabe unwiderruflich Löschen?").setPositiveButton("Ja", dialogClickListener)
+                        .setNegativeButton("Nein", dialogClickListener).show();
+            }
+        };
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+        /* Set Clicker for DeleteText */
+        btnDeleteText.setOnClickListener(clickerDeleteText);
+
+    }
 
 }

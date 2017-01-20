@@ -4,6 +4,6 @@
     <color name="colorMenuBar">#6680cbc4</color>
     <color name="colorPrimaryDark">#de000000</color>
     <color name="colorAccent">#f2482f</color>
-    <color name="colorVoiceEntryBackground">#b3d5ff</color>
+    <color name="colorVoiceEntryBackground">#e39582</color>
     <color name="colorAppBar">#d35435</color>
 </resources>
