@@ -58,7 +58,7 @@ public class TableManager implements Serializable{
         this.adapter = new EntryAdapter(this.context, this.arrayList, this);
         this.table.setAdapter(this.adapter);
 
-        table.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        /*table.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
 
@@ -69,7 +69,7 @@ public class TableManager implements Serializable{
 
                 return false;
             }
-        });
+        });*/
     }
 
     public void addEntry(Note note) throws NullPointerException {

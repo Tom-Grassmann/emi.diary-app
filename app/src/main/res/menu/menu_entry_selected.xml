@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item android:id="@+id/MenuSelected_AddEntry"
-        android:icon="@drawable/ic_plus"
+    <item android:id="@+id/MenuSelected_ShareEntry"
+        android:icon="@drawable/ic_share"
+        android:title="Share"
+        android:showAsAction="ifRoom" />
+
+    <item android:id="@+id/MenuSelected_EditEntry"
+        android:icon="@drawable/ic_edit"
         android:title="Neuer Eintrag"
         android:showAsAction="ifRoom"/>
 
@@ -11,9 +16,5 @@
         android:title="Löschen"
         android:showAsAction="ifRoom" />
 
-    <item android:id="@+id/MenuSelected_ShareEntry"
-        android:icon="@drawable/ic_share"
-        android:title="Share"
-        android:showAsAction="ifRoom" />
 
 </menu>

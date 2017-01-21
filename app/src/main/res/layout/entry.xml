@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:textIsSelectable="false"
-    >
+    android:id="@+id/entry_linLay">
 
     <LinearLayout
         android:orientation="horizontal"
@@ -14,8 +14,7 @@
         android:textIsSelectable="false"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:id="@+id/entry_linLay">
+        android:layout_marginRight="10dp">
 
         <TextView
             android:text="TextView"
@@ -27,19 +26,6 @@
             android:textIsSelectable="false"
             android:textStyle="normal|bold"
             android:layout_weight="1"/>
-
-        <ImageButton
-            android:id="@+id/btnEntryMenu"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/ic_menu"
-            android:scaleType="fitCenter"
-            style="@android:style/Widget.Holo.Light.ActionButton"
-
-            android:elevation="0dp"
-            android:layout_width="80dp"
-            android:scaleX="2"
-            android:scaleY="2"
-            android:layout_height="40dp" />
 
     </LinearLayout>
 

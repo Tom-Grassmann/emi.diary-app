@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -50,29 +51,32 @@ public class MainActivity extends AppCompatActivity {
         database = new Database(this);
         tableManager = new TableManager(this, table, database);
 
-        btnAdd.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View view) {
-
-                Note note = new Note(database.getNextFreeID(), "New Entry");
-
-                Intent i = new Intent(MainActivity.this, EditEntryActivity.class);
-                i.putExtra("note", note);
-                i.putExtra("requestCode", ADD_ENTRY);
-
-                startActivityForResult(i, ADD_ENTRY);
-
-
-            }
-        });
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_entry_selected, menu);
+        inflater.inflate(R.menu.menu_main, menu);
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.MenuSelected_AddEntry) {
+
+            Note note = new Note(database.getNextFreeID(), "New Entry");
+
+            Intent i = new Intent(MainActivity.this, EditEntryActivity.class);
+            i.putExtra("note", note);
+            i.putExtra("requestCode", ADD_ENTRY);
+
+            startActivityForResult(i, ADD_ENTRY);
+        }
+
+
+        return super.onOptionsItemSelected(item);
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

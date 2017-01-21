@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/MenuSelected_AddEntry"
+        android:icon="@drawable/ic_plus"
+        android:title="Neuer Eintrag"
+        android:showAsAction="ifRoom"/>
+
+</menu>

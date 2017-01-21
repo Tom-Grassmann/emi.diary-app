@@ -83,7 +83,7 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
             @Override
             public boolean onLongClick(View view) {
 
-                ((MainActivity) context).startActionMode(new ActionBarCallback(note));
+                ((MainActivity) context).startActionMode(new ActionBarCallback(tableManager, context, note));
 
                 return false;
             }
@@ -270,69 +270,6 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
             entryVoice.addView(voiceEntry);
         }
         entryImage.addView(imageEntry);
-
-
-        ImageButton btnEntryMenu = (ImageButton) entry.findViewById(R.id.btnEntryMenu);
-
-        btnEntryMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-
-                PopupMenu popup = new PopupMenu(context, view);
-                popup.getMenuInflater().inflate(R.menu.menu_click_on_entry, popup.getMenu());
-
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-
-                        if (item.getTitle().toString().equals("Anzeigen")) {
-
-                            Intent i = new Intent(context, EditEntryActivity.class);
-                            i.putExtra("note", note);
-                            i.putExtra("requestCode", EDIT_ENTRY);
-
-                            if (context instanceof MainActivity) {
-
-                                ((MainActivity) context).startActivityForResult(i, EDIT_ENTRY);
-                            }
-                        }
-
-                        if (item.getTitle().toString().equals("Löschen")) {
-
-
-                            /* Dialog before deleting */
-                            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    switch (which){
-                                        case DialogInterface.BUTTON_POSITIVE:
-
-                                            EntryAdapter.this.tableManager.removeEntry(note);
-
-                                            break;
-
-                                        case DialogInterface.BUTTON_NEGATIVE:
-
-                                            break;
-                                    }
-                                }
-                            };
-
-                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setMessage("Der Eintrag wird unwiederruflich gelöscht. Fortfahren?").setPositiveButton("Ja", dialogClickListener)
-                                    .setNegativeButton("Nein", dialogClickListener).show();
-
-                        }
-
-                        return false;
-                    }
-                });
-
-                popup.show();
-            }
-        });
-
 
         return entry;
     }
