@@ -106,11 +106,6 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/LinLayAudioPlayer">
 
-                    <Space
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
                     <ImageButton
                         android:id="@+id/btnDeleteAudio"
                         android:scaleType="fitCenter"

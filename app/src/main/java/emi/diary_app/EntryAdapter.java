@@ -78,6 +78,18 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
         tvDate.setText(note.getDate());
 
 
+        LinearLayout entryLinLay = (LinearLayout) entry.findViewById(R.id.entry_linLay);
+        entryLinLay.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                ((MainActivity) context).startActionMode(new ActionBarCallback(note));
+
+                return false;
+            }
+        });
+
+
         LinearLayout entryText = (LinearLayout) entry.findViewById(R.id.entryText);
         final LinearLayout entryVoice = (LinearLayout) entry.findViewById(R.id.entryVoice);
         LinearLayout entryImage = (LinearLayout) entry.findViewById(R.id.entryImage);

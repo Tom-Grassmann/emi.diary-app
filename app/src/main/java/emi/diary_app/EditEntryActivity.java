@@ -35,6 +35,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -320,7 +321,7 @@ public class EditEntryActivity extends AppCompatActivity {
             }
 
 
-        /* Override existing File */
+            /* Override existing File */
             if (audioFile != null) {
 
                 audioFile.delete();
@@ -547,7 +548,6 @@ public class EditEntryActivity extends AppCompatActivity {
         voiceEntry.setLayoutParams(params);
 
         /* Adding View to LinearLayout from Activity */
-        linLayAudioPlayer.removeViewAt(0);
         linLayAudioPlayer.addView(voiceEntry, 0);
 
         /* Set up AudioPlayer DeleteButton */
@@ -692,6 +692,13 @@ public class EditEntryActivity extends AppCompatActivity {
                                 LinearLayout linLayAudioPlayer = (LinearLayout) findViewById(R.id.LinLayAudioPlayer);
 
                                 linLayAudioPlayer.removeViewAt(0);
+
+                                Space space = new Space(EditEntryActivity.this);
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1);
+                                space.setLayoutParams(params);
+
+                                linLayAudioPlayer.addView(space, 0);
+
                                 note.setVoiceNote("");
 
                                 audioFile.delete();

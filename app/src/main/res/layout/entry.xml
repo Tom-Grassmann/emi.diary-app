@@ -14,7 +14,8 @@
         android:textIsSelectable="false"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp">
+        android:layout_marginRight="10dp"
+        android:id="@+id/entry_linLay">
 
         <TextView
             android:text="TextView"

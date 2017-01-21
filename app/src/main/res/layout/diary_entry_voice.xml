@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_weight="1">
 
     <LinearLayout
@@ -21,7 +21,7 @@
         >
 
         <SeekBar
-            style="@android:style/Widget.Holo.SeekBar"
+            style="?android:attr/seekBarStyle"
             android:layout_width="match_parent"
             android:textIsSelectable="false"
             android:layout_weight="1"
@@ -29,9 +29,11 @@
             android:progress="0"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
+            android:minHeight="14dp"
+            android:thumbOffset="16dp"
             android:layout_height="30dp"
-            android:minHeight="14dp" />
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp" />
 
 
 
