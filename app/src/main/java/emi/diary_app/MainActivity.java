@@ -17,19 +17,20 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements ActionBar.OnNavigationListener {
 
     final static int EDIT_ENTRY = 1;
     final static int ADD_ENTRY = 2;
 
-    private ListView table;
-    private ImageButton
-            btnAdd,
-            btnShare;
-
-
+    private ListView listView;
     private TableManager tableManager;
     private Database database;
+    private ActionBar actionBar;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,15 +44,10 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        table = (ListView) findViewById(R.id.tableDisplayEntry);
-
-        btnAdd = (ImageButton) findViewById(R.id.btnAdd);
-        btnShare = (ImageButton) findViewById(R.id.btnShare);
+        listView = (ListView) findViewById(R.id.tableDisplayEntry);
 
         database = new Database(this);
-        tableManager = new TableManager(this, table, database);
-
-
+        tableManager = new TableManager(this, listView, database);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -103,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (requestCode == ADD_ENTRY) {
 
                 Note note = (Note) data.getSerializableExtra("note");
+
                 /* Decode Image from path */
                 Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
                 note.setBitmap(image);
@@ -113,5 +110,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(int i, long l) {
+        return false;
     }
 }

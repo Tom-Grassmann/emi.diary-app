@@ -4,10 +4,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -78,12 +80,14 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
         tvDate.setText(note.getDate());
 
 
-        LinearLayout entryLinLay = (LinearLayout) entry.findViewById(R.id.entry_linLay);
+        final LinearLayout entryLinLay = (LinearLayout) entry.findViewById(R.id.entry_linLay);
+        entryLinLay.setBackgroundColor(context.getResources().getColor(R.color.entry_not_selected));
+
         entryLinLay.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
 
-                ((MainActivity) context).startActionMode(new ActionBarCallback(tableManager, context, note));
+                ((MainActivity) context).startActionMode(new ActionBarCallback_MainActivity(tableManager, context, note, entryLinLay));
 
                 return false;
             }
@@ -124,6 +128,76 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
             /* - - - Set up SeekBar - - - - - - - - - - - - - - - - - - - - - - - -  */
             playerSeekBar = (SeekBar) voiceEntry.findViewById(R.id.playerProgressBar);
+
+            /* Creating Listener for moving SeekBar */
+            View.OnTouchListener touchSeek = new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                    switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+
+                        case MotionEvent.ACTION_DOWN:
+                            view.setPressed(true);
+
+                            if (playVoiceContent.state == PlayState.PLAYING || playVoiceContent.state == PlayState.PAUSED) {
+
+                                mediaPlayer.pause();
+
+                                playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
+
+                                actualNotePlaying = -1;
+
+                            } else if (playVoiceContent.state == PlayState.STOPPED) {
+
+                                /* Do noting... */
+                            }
+
+                            break;
+                        case MotionEvent.ACTION_UP:
+                        case MotionEvent.ACTION_OUTSIDE:
+                        case MotionEvent.ACTION_CANCEL:
+                            view.setPressed(false);
+
+                            if (playVoiceContent.state == PlayState.PLAYING) {
+
+                                mediaPlayer.seekTo(playerSeekBar.getProgress());
+
+                                /* Set up "Play" Icon */
+                                playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
+
+                                mediaPlayer.start();
+
+                                /* SeekBar updation */
+                                myHandler.postDelayed(UpdateSongTime,100);
+
+
+                                actualNotePlaying = note.getID();
+
+                            } else if (playVoiceContent.state == PlayState.STOPPED) {
+
+                                note.setLastPlayedDuration(playerSeekBar.getProgress());
+
+                            } else if (playVoiceContent.state == PlayState.PAUSED) {
+
+                                /* Seek to Duration*/
+                                mediaPlayer.seekTo(playerSeekBar.getProgress());
+                            }
+
+                            break;
+                        case MotionEvent.ACTION_POINTER_DOWN:
+                            break;
+                        case MotionEvent.ACTION_POINTER_UP:
+                            break;
+                        case MotionEvent.ACTION_MOVE:
+                            break;
+                    }
+
+                    return false;
+                }
+            };
+
+            playerSeekBar.setOnTouchListener(touchSeek);
+
             note.setSeekBar(playerSeekBar);
 
             /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -208,6 +282,8 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                                 /* Set up "Pause" Icon */
                                 playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
 
+                                 /* Reset LastPlayedDuration in Note */
+                                note.setLastPlayedDuration(0);
 
                                 actualNotePlaying = -1;
                             }
@@ -217,11 +293,16 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                         mediaPlayer.start();
                         actualNotePlaying = note.getID();
 
+                        /* If LastPlayedDuration not 0 -> Seek to Duration*/
+                        if (note.getLastPlayedDuration() > 0) {
+
+                            mediaPlayer.seekTo(note.getLastPlayedDuration());
+                        }
+
 
                         /* SeekBar updation */
                         playerSeekBar = note.getSeekBar();
                         playerSeekBar.setMax(mediaPlayer.getDuration());
-                        playerSeekBar.setProgress((int)startTime);
                         myHandler.postDelayed(UpdateSongTime,100);
 
                         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -241,7 +322,6 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                         /* SeekBar updation */
                         playerSeekBar = note.getSeekBar();
                         playerSeekBar.setMax(mediaPlayer.getDuration());
-                        playerSeekBar.setProgress((int)startTime);
                         myHandler.postDelayed(UpdateSongTime,100);
 
                         playVoiceContent.setPlaying();

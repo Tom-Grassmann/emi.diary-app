@@ -7,8 +7,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="/media/HDD/Dropbox/study/1.sem/emi/app-project/emi.diary-app" />
-            <option value="/media/HDD/Dropbox/study/1.sem/emi/app-project/emi.diary-app/app" />
+            <option value="/mnt/HDD/Dropbox/study/1.sem/emi/app-project/emi.diary-app" />
+            <option value="/mnt/HDD/Dropbox/study/1.sem/emi/app-project/emi.diary-app/app" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

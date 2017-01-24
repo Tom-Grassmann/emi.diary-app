@@ -29,8 +29,11 @@
         </activity>
         <activity
             android:name=".EditEntryActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".ShareActivity"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".ShareActivity"
+            android:theme="@style/AppTheme">
+        </activity>
     </application>
 
 </manifest>

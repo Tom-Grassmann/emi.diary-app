@@ -28,53 +28,6 @@
 
         </ListView>
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/colorAppBar"
-            android:layout_weight="7">
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="20" />
-
-            <ImageButton
-                android:id="@+id/btnShare"
-                android:layout_width="match_parent"
-                android:textSize="60sp"
-                android:textStyle="normal|bold"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_share"
-                style="@android:style/Widget.Holo.Light.ActionButton"
-                android:maxHeight="50dp"
-                android:scaleX="1.8"
-                android:scaleY="1.8"
-                android:layout_weight="0.5"
-                android:layout_height="70dp"
-                android:visibility="invisible"
-                android:saveEnabled="false" />
-
-            <ImageButton
-                android:id="@+id/btnAdd"
-                android:layout_width="match_parent"
-                android:minHeight="0dp"
-                style="@android:style/Widget.Holo.Light.ActionButton"
-                app:srcCompat="@drawable/ic_plus"
-                android:scaleType="fitCenter"
-                android:layout_height="70dp"
-                android:textSize="50sp"
-                android:textStyle="normal|bold"
-                android:layout_below="@+id/btnShare"
-                android:scaleX="1.6"
-                android:scaleY="1.6"
-                android:elevation="1dp"
-                android:layout_weight="0.5"
-                android:maxHeight="40dp" />
-        </LinearLayout>
-
-
 
     </LinearLayout>
 

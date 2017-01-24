@@ -28,6 +28,8 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
 
     protected NoteType noteType;
 
+    protected int playerDuration = 0;
+
 
     public Note(int ID, String title) {
 
@@ -193,5 +195,13 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
 
     public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
+    }
+
+    public int getPlayerDuration() {
+        return playerDuration;
+    }
+
+    public void setPlayerDuration(int playerDuration) {
+        this.playerDuration = playerDuration;
     }
 }

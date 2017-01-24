@@ -106,6 +106,7 @@ public class EditEntryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         this.note = (Note) getIntent().getSerializableExtra("note");
+        note.setLastPlayedDuration(0);
         REQUEST_CODE = (int) getIntent().getSerializableExtra("requestCode");
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -127,9 +128,8 @@ public class EditEntryActivity extends AppCompatActivity {
             /* Set up ImageView */
             Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
             imageView.setImageBitmap(image);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, image.getHeight(), 1);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 300, 1);
             imageView.setLayoutParams(params);
-            imageView.setMaxHeight(500);
             imageView.setVisibility(View.VISIBLE);
 
             /* Set up DeleteButton for Picture */
@@ -137,7 +137,7 @@ public class EditEntryActivity extends AppCompatActivity {
 
             btnDeletePicture.setOnClickListener(clickerDeletePicture);
 
-
+            note.setBitmap(image);
         }
 
         if (REQUEST_CODE == EDIT_ENTRY) {
@@ -183,7 +183,7 @@ public class EditEntryActivity extends AppCompatActivity {
                     FileOutputStream fos = null;
                     try {
                         fos = new FileOutputStream(reportFilePath);
-                        note.getBitmap().compress(Bitmap.CompressFormat.PNG, 100 , fos);
+                        note.getBitmap().compress(Bitmap.CompressFormat.PNG, 100 ,fos);
                         fos.close();
                     }
                     catch (Exception ex) {
@@ -320,19 +320,15 @@ public class EditEntryActivity extends AppCompatActivity {
                 mediaRecorder.release();
             }
 
-
             /* Override existing File */
             if (audioFile != null) {
 
                 audioFile.delete();
             }
 
-
             mediaRecorder = new MediaRecorder();
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-
-
 
             mediaRecorder.setOutputFile(audioFile.getPath());
             mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
@@ -381,16 +377,14 @@ public class EditEntryActivity extends AppCompatActivity {
                 Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
 
                 imageView.setImageBitmap(bitmap);
-                imageView.setMaxHeight(500);
 
                 /* Set Bitmap to Note */
                 note.setBitmap(bitmap);
 
                 /* Make imageView visivle */
                 imageView.setVisibility(View.VISIBLE);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, bitmap.getHeight(), 1);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 300, 1);
                 imageView.setLayoutParams(params);
-                imageView.setMaxHeight(500);
 
                 /* Set up DeleteButton for Picture */
                 btnDeletePicture.setVisibility(View.VISIBLE);
@@ -406,9 +400,8 @@ public class EditEntryActivity extends AppCompatActivity {
 
             /* Make imageView visivle */
             imageView.setVisibility(View.VISIBLE);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, imageBitmap.getHeight(), 1);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 300, 1);
             imageView.setLayoutParams(params);
-            imageView.setMaxHeight(500);
 
             /* Set up DeleteButton for Picture */
             btnDeletePicture.setVisibility(View.VISIBLE);
@@ -441,7 +434,94 @@ public class EditEntryActivity extends AppCompatActivity {
         linearLayout.addView(playVoiceContent, 0);
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+
         playerSeekBar = (SeekBar) voiceEntry.findViewById(R.id.playerProgressBar);
+
+        /* -  Creating MediaPlayer to get Duration for SeekBar - - - - */
+        mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(note.getVoiceNote());
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        playerSeekBar.setMax(mediaPlayer.getDuration());
+        mediaPlayer.reset();
+        mediaPlayer.release();
+        mediaPlayer = null;
+        /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+        /* Creating Listener for moving SeekBar */
+        View.OnTouchListener touchSeek = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+
+                    case MotionEvent.ACTION_DOWN:
+                        view.setPressed(true);
+
+                        if (playVoiceContent.state == PlayState.PLAYING || playVoiceContent.state == PlayState.PAUSED) {
+
+                            mediaPlayer.pause();
+
+                            playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+
+                            AUDIO_PLAYING = false;
+
+                        } else if (playVoiceContent.state == PlayState.STOPPED) {
+
+                            /* Do noting... */
+                        }
+
+                        break;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_OUTSIDE:
+                    case MotionEvent.ACTION_CANCEL:
+                        view.setPressed(false);
+
+                        if (playVoiceContent.state == PlayState.PLAYING) {
+
+                            mediaPlayer.seekTo(playerSeekBar.getProgress());
+
+                            /* Set up "Play" Icon */
+                            playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
+
+                            mediaPlayer.start();
+
+                             /* SeekBar updation */
+                            myHandler.postDelayed(UpdateSongTime,100);
+
+
+                            AUDIO_PLAYING = true;
+
+                        } else if (playVoiceContent.state == PlayState.STOPPED) {
+
+                            note.setLastPlayedDuration(playerSeekBar.getProgress());
+
+                        } else if (playVoiceContent.state == PlayState.PAUSED) {
+
+                            /* Seek to Duration*/
+                            mediaPlayer.seekTo(playerSeekBar.getProgress());
+
+                            AUDIO_PLAYING = true;
+                        }
+
+                        break;
+                    case MotionEvent.ACTION_POINTER_DOWN:
+                        break;
+                    case MotionEvent.ACTION_POINTER_UP:
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        break;
+                }
+
+                return false;
+            }
+        };
+
+        playerSeekBar.setOnTouchListener(touchSeek);
 
         playVoiceContent.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -486,6 +566,7 @@ public class EditEntryActivity extends AppCompatActivity {
                         mediaPlayer.stop();
                         mediaPlayer.reset();
                         mediaPlayer.release();
+                        mediaPlayer = null;
 
                         /* Set State of PlayButton to "Stopped" */
                         playVoiceContent.setStopped();
@@ -495,22 +576,27 @@ public class EditEntryActivity extends AppCompatActivity {
 
                         /* Set up "Pause" Icon */
                         playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+
+                        /* Reset LastPlayedDuration in Note */
+                        note.setLastPlayedDuration(0);
                     }
                 });
 
                 /* Start Audio */
                 mediaPlayer.start();
 
+                /* If LastPlayedDuration not 0 -> Seek to Duration*/
+                if (note.getLastPlayedDuration() > 0) {
+
+                    mediaPlayer.seekTo(note.getLastPlayedDuration());
+                }
+
                 AUDIO_PLAYING = true;
 
-
                 /* SeekBar updation */
-                playerSeekBar.setMax(mediaPlayer.getDuration());
-                playerSeekBar.setProgress((int)startTime);
                 myHandler.postDelayed(UpdateSongTime,100);
 
                 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
 
                 playVoiceContent.setPlaying();
 
@@ -523,8 +609,6 @@ public class EditEntryActivity extends AppCompatActivity {
                 mediaPlayer.start();
 
                 /* SeekBar updation */
-                playerSeekBar.setMax(mediaPlayer.getDuration());
-                playerSeekBar.setProgress((int)startTime);
                 myHandler.postDelayed(UpdateSongTime,100);
 
                 playVoiceContent.setPlaying();
@@ -606,6 +690,7 @@ public class EditEntryActivity extends AppCompatActivity {
         editTextContent = (EditText) findViewById(R.id.editTextContent);
 
         imageView = (ImageView) findViewById(R.id.imageView);
+        imageView.setVisibility(View.GONE);
         btnAddPicture = (ImageButton) findViewById(R.id.btnAddPicture);
 
         /* - - - Set up OnClickListener of Delete Buttons - - - - - - - - - - - */

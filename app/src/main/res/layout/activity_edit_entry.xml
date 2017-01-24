@@ -84,7 +84,8 @@
                         android:scaleType="fitCenter"
                         android:visibility="invisible"
                         android:layout_weight="1"
-                        android:layout_height="0dp" />
+                        android:minHeight="0dp"
+                        android:layout_height="150dp" />
 
                     <ImageButton
                         android:id="@+id/btnDeletePicture"
@@ -104,7 +105,8 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/LinLayAudioPlayer">
+                    android:id="@+id/LinLayAudioPlayer"
+                    android:layout_marginTop="5dp">
 
                     <ImageButton
                         android:id="@+id/btnDeleteAudio"
