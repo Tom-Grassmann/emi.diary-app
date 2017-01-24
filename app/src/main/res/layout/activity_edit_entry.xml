@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_edit_entry"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context="emi.diary_app.EditEntryActivity">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:id="@+id/LinearLayoutEditEntry">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:ems="10"
+                        android:id="@+id/editTitle"
+                        android:hint="Füge einen Titel hinzu..."
+                        android:layout_weight="1"
+                        style="@android:style/Widget.Holo.Light.EditText" />
+
+                    <ImageButton
+                        android:id="@+id/btnDeleteText"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/ic_delete"
+                        style="@android:style/Widget.Holo.Light.ActionButton"
+                        android:maxHeight="50dp"
+                        android:scaleX="1.5"
+                        android:scaleY="1.5"
+                        android:layout_weight="9"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp" />
+
+                </LinearLayout>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:inputType="textMultiLine"
+                    android:ems="10"
+                    android:id="@+id/editTextContent"
+                    android:scrollbars = "vertical"
+                    android:gravity="start"
+                    android:layout_gravity="center"
+                    android:verticalScrollbarPosition="defaultPosition"
+                    android:hint="Liebes Tagebuch..."
+                    android:layout_height="wrap_content"
+                    style="@android:style/Widget.Holo.Light.EditText"
+                    android:minHeight="250dp" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        app:srcCompat="@android:drawable/ic_menu_report_image"
+                        android:id="@+id/imageView"
+                        android:scaleType="fitCenter"
+                        android:visibility="invisible"
+                        android:layout_weight="1"
+                        android:minHeight="0dp"
+                        android:layout_height="150dp" />
+
+                    <ImageButton
+                        android:id="@+id/btnDeletePicture"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/ic_delete"
+                        style="@android:style/Widget.Holo.Light.ActionButton"
+                        android:maxHeight="50dp"
+                        android:scaleX="1.5"
+                        android:scaleY="1.5"
+                        android:layout_weight="9"
+                        android:layout_height="45dp"
+                        android:layout_width="match_parent" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/LinLayAudioPlayer"
+                    android:layout_marginTop="5dp">
+
+                    <ImageButton
+                        android:id="@+id/btnDeleteAudio"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/ic_delete"
+                        style="@android:style/Widget.Holo.Light.ActionButton"
+                        android:maxHeight="50dp"
+                        android:scaleX="1.5"
+                        android:scaleY="1.5"
+                        android:layout_weight="9"
+                        android:layout_height="45dp"
+                        android:layout_width="match_parent" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorAppBar"
+            android:layout_weight="7"
+            android:id="@+id/toolBar">
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="100" />
+
+            <ImageButton
+                android:id="@+id/btnSaveEntry"
+                android:layout_width="match_parent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_save"
+                style="@android:style/Widget.Holo.Light.ActionButton"
+                android:maxHeight="50dp"
+                android:scaleX="1.7"
+                android:scaleY="1.7"
+                android:layout_weight="0.1"
+                android:layout_height="60dp" />
+
+            <ImageButton
+                android:id="@+id/btnTakePicture"
+                android:layout_width="match_parent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_camery"
+                style="@android:style/Widget.Holo.Light.ActionButton"
+                android:maxHeight="50dp"
+                android:scaleX="2"
+                android:scaleY="2"
+                android:layout_weight="0.1"
+                android:layout_height="60dp" />
+
+            <ImageButton
+                android:id="@+id/btnAddPicture"
+                android:layout_width="match_parent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_picture_add"
+                style="@android:style/Widget.Holo.Light.ActionButton"
+                android:maxHeight="50dp"
+                android:scaleX="1.8"
+                android:scaleY="1.8"
+                android:layout_weight="0.1"
+                android:layout_height="60dp" />
+
+            <ImageButton
+                android:id="@+id/btnRecordAudio"
+                android:layout_width="match_parent"
+                android:minHeight="0dp"
+                style="@android:style/Widget.Holo.Light.ActionButton"
+                app:srcCompat="@drawable/ic_microfphone"
+                android:scaleType="fitCenter"
+                android:layout_below="@+id/btnShare"
+                android:scaleX="1.8"
+                android:scaleY="1.8"
+                android:elevation="1dp"
+                android:layout_weight="0.1"
+                android:maxHeight="40dp"
+                android:layout_height="60dp"
+                android:layout_marginBottom="10dp" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

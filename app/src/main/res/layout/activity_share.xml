@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_edit_entry"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:id="@+id/LinearLayoutEditEntry">
+
+
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/LinLayTitle">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:ems="10"
+                        android:id="@+id/tvTitle"
+                        android:layout_weight="1"
+                        style="?android:attr/textViewStyle"
+                        android:text="Das ist ein Titel"
+                        android:textSize="24sp"
+                        android:textColor="@color/text_title"
+                        android:textStyle="normal|bold"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:id="@+id/LinLayText"
+                    android:clickable="true"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:textIsSelectable="false"
+                        android:layout_width="match_parent"
+                        android:inputType="textMultiLine"
+                        android:ems="10"
+                        android:id="@+id/tvTextContent"
+                        android:scrollbars = "vertical"
+                        android:gravity="start"
+                        android:layout_gravity="center"
+                        android:verticalScrollbarPosition="defaultPosition"
+                        android:layout_height="match_parent"
+                        style="?android:attr/textViewStyle"
+                        android:minHeight="250dp"
+                        android:layout_weight="1"
+                        android:text="Content und noch viel mehr Content"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_text_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginBottom="5dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/LinLayPicture"
+                    android:clickable="true"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        app:srcCompat="@android:drawable/ic_menu_report_image"
+                        android:id="@+id/imageView"
+                        android:scaleType="fitCenter"
+                        android:visibility="invisible"
+                        android:layout_weight="1"
+                        android:minHeight="250dp"
+                        android:layout_height="150dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/LinLayAudioPlayer"
+                    android:clickable="true">
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+        </ScrollView>
+
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

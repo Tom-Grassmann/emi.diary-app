@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#bc4729</color>
+    <color name="colorMenuBar">#6680cbc4</color>
+    <color name="colorPrimaryDark">#de000000</color>
+    <color name="colorAccent">#f2482f</color>
+    <color name="colorVoiceEntryBackground">#f1cac1</color>
+    <color name="colorAppBar">#bc4729</color>
+    <color name="apptheme_color">#bc4729</color>
+    <color name="entry_selected">#d9d9d9</color>
+    <color name="entry_not_selected">#eeeeee</color>
+
+    <color name="text_title">#404040</color>
+    <color name="text_text_content">#262626</color>
+
+
+
 </resources>
