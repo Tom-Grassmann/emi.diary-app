@@ -72,7 +72,7 @@ public class ShareActivity extends AppCompatActivity {
         }
 
 
-        /* Load Audio when existing and enable RadButton */
+        /* Load Audio when existing */
         /*if (!note.getVoiceNote().equals("")) {
 
             createAudioPlayer();
@@ -121,10 +121,6 @@ public class ShareActivity extends AppCompatActivity {
 
         imageView = (ImageView) findViewById(R.id.imageView);
         imageView.setVisibility(View.GONE);
-
-
-
-
 
 
 
