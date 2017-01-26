@@ -126,6 +126,11 @@ public class TableManager implements Serializable{
         return true;
     }
 
+    public void notifyAdapter() {
+
+        this.adapter.notifyDataSetChanged();
+    }
+
 
 }
 

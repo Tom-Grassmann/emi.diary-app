@@ -74,9 +74,9 @@
                         android:gravity="start"
                         android:layout_gravity="center"
                         android:verticalScrollbarPosition="defaultPosition"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         style="?android:attr/textViewStyle"
-                        android:minHeight="250dp"
+                        android:minHeight="200dp"
                         android:layout_weight="1"
                         android:text="Content und noch viel mehr Content"
                         android:textSize="15sp"
@@ -93,7 +93,9 @@
                     android:id="@+id/LinLayPicture"
                     android:clickable="true"
                     android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp">
+                    android:layout_marginBottom="10dp"
+                    android:paddingBottom="5dp"
+                    android:paddingTop="5dp">
 
                     <ImageView
                         android:layout_width="match_parent"

@@ -10,6 +10,11 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.Image;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -45,13 +50,18 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class EditEntryActivity extends AppCompatActivity {
 
-    private static final int PICK_IMAGE = 2;
+    static final int PICK_IMAGE = 2;
     static final int REQUEST_IMAGE_CAPTURE = 3;
-
+    static final int RESULT_OK_NO_LOCATION = 10;
 
     private EditText
             editTitle,
@@ -203,6 +213,8 @@ public class EditEntryActivity extends AppCompatActivity {
                     note.setImageNote("");
                 }
 
+
+
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("note", note);
                 setResult(Activity.RESULT_OK, resultIntent);
@@ -310,6 +322,7 @@ public class EditEntryActivity extends AppCompatActivity {
         });
 
     }
+
 
     void startRecord() throws Exception {
 
@@ -666,7 +679,6 @@ public class EditEntryActivity extends AppCompatActivity {
 
                 playerSeekBar.setProgress((int)startTime);
                 myHandler.postDelayed(this, 100);
-
             }
         }
     };

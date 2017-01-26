@@ -77,7 +77,7 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
         /* Set Title and Date */
         tvTitle.setText(note.getTitle());
-        tvDate.setText(note.getDate());
+        tvDate.setText(note.getDate_Location());
 
 
         final LinearLayout entryLinLay = (LinearLayout) entry.findViewById(R.id.entry_linLay);
@@ -169,7 +169,6 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
                                 /* SeekBar updation */
                                 myHandler.postDelayed(UpdateSongTime,100);
-
 
                                 actualNotePlaying = note.getID();
 

@@ -16,6 +16,7 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
     protected int ID;
     protected long timestamp;
     protected String title;
+    protected String city;
 
     protected transient SeekBar seekBar;
     protected int lastPlayedDuration;
@@ -146,13 +147,22 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
         return this.timestamp;
     }
 
-    public String getDate() {
+    public String getDate_Location() {
+
+        String location = "";
+
+        if (this.city != null) {
+            if (!this.city.equals("NO_LOCATION")) {
+
+                location = this.city;
+            }
+        }
 
         Calendar calendar = Calendar.getInstance(Locale.GERMAN);
         calendar.setTimeInMillis(this.timestamp);
         DateFormat dateFormat = new DateFormat();
 
-        return dateFormat.format("hh:mm:ss, dd.MM.yyyy", calendar).toString();
+        return dateFormat.format("hh:mm:ss, dd.MM.yyyy", calendar).toString() + " " + location;
     }
 
 
@@ -203,5 +213,13 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
 
     public void setPlayerDuration(int playerDuration) {
         this.playerDuration = playerDuration;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }
