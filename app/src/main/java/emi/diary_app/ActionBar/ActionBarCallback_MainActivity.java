@@ -1,19 +1,20 @@
-package emi.diary_app;
+package emi.diary_app.ActionBar;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import java.util.ArrayList;
+import emi.diary_app.Activity.EditEntryActivity;
+import emi.diary_app.Activity.MainActivity;
+import emi.diary_app.Activity.ShareActivity;
+import emi.diary_app.Note;
+import emi.diary_app.R;
+import emi.diary_app.ListManagement.TableManager;
 
 public class ActionBarCallback_MainActivity implements ActionMode.Callback {
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="LOCATION_FOUND">20</integer>
+    <integer name="LOCATION_ERROR">21</integer>
+
+
+</resources>

@@ -1,4 +1,4 @@
-package emi.diary_app;
+package emi.diary_app.Activity;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,13 +7,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import emi.diary_app.ActionBar.ActionBarCallback_ShareActivity;
+import emi.diary_app.Note;
+import emi.diary_app.R;
 
 public class ShareActivity extends AppCompatActivity {
 

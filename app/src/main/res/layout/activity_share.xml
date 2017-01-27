@@ -105,7 +105,7 @@
                         android:visibility="invisible"
                         android:layout_weight="1"
                         android:minHeight="250dp"
-                        android:layout_height="150dp" />
+                        android:layout_height="200dp" />
 
                 </LinearLayout>
 

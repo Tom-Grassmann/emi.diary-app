@@ -1,16 +1,17 @@
-package emi.diary_app;
+package emi.diary_app.ListManagement;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import emi.diary_app.Database.Database;
+import emi.diary_app.Note;
 
 public class TableManager implements Serializable{
 
@@ -21,14 +22,6 @@ public class TableManager implements Serializable{
     private Database database;
 
     public TableManager(final Context context, final ListView table, Database database) throws NullPointerException {
-
-        if (table == null) {
-            throw new NullPointerException("Table darf nicht NULL sein!");
-        }
-
-        if (database == null) {
-            throw new NullPointerException("Datenbank darf nicht NULL sein!");
-        }
 
         this.table = table;
         this.context = context;
@@ -42,9 +35,10 @@ public class TableManager implements Serializable{
 
             Note note = new Note(data.getInt(0), data.getString(1));
             note.setTimestamp(data.getLong(2));
-            note.setTextNote(data.getString(3));
-            note.setVoiceNote(data.getString(4));
-            note.setImageNote(data.getString(5));
+            note.setCity(data.getString(3));
+            note.setTextNote(data.getString(4));
+            note.setVoiceNote(data.getString(5));
+            note.setImageNote(data.getString(6));
 
             /* Decode Image from path */
             Bitmap image = BitmapFactory.decodeFile(note.getImageNote());

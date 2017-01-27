@@ -1,32 +1,29 @@
-package emi.diary_app;
+package emi.diary_app.ListManagement;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+
+import emi.diary_app.ActionBar.ActionBarCallback_MainActivity;
+import emi.diary_app.Activity.MainActivity;
+import emi.diary_app.Note;
+import emi.diary_app.PlayButton;
+import emi.diary_app.PlayState;
+import emi.diary_app.R;
 
 
 public class EntryAdapter extends BaseAdapter implements Serializable{

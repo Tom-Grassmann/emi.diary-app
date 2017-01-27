@@ -1,40 +1,27 @@
-package emi.diary_app;
+package emi.diary_app.Activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.media.Image;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.Environment;
+import android.os.Build;
 import android.os.Handler;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -44,24 +31,20 @@ import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import emi.diary_app.Note;
+import emi.diary_app.PlayButton;
+import emi.diary_app.PlayState;
+import emi.diary_app.R;
 
 public class EditEntryActivity extends AppCompatActivity {
 
     static final int PICK_IMAGE = 2;
     static final int REQUEST_IMAGE_CAPTURE = 3;
-    static final int RESULT_OK_NO_LOCATION = 10;
 
     private EditText
             editTitle,
@@ -86,6 +69,8 @@ public class EditEntryActivity extends AppCompatActivity {
             clickerDeleteText,
             clickerDeletePicture,
             clickerDeleteAudio;
+
+    private Uri imageUri;
 
 
 
@@ -227,8 +212,6 @@ public class EditEntryActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-
-
                 /* Start Activity to Choose Picture from Gallery */
                 Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 getIntent.setType("image/*");
@@ -313,10 +296,19 @@ public class EditEntryActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    System.out.println(Integer.toString(checkSelfPermission("GPS")));
                 }
+
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, Integer.toString(note.getID()));
+                values.put(MediaStore.Images.Media.DESCRIPTION, note.getTitle());
+                imageUri = getContentResolver().insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
 
             }
         });
@@ -407,22 +399,40 @@ public class EditEntryActivity extends AppCompatActivity {
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            imageView.setImageBitmap(imageBitmap);
+            try {
 
-            /* Make imageView visivle */
-            imageView.setVisibility(View.VISIBLE);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 300, 1);
-            imageView.setLayoutParams(params);
+                /* Getting Bitmap */
+                Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(
+                        getContentResolver(), imageUri);
 
-            /* Set up DeleteButton for Picture */
-            btnDeletePicture.setVisibility(View.VISIBLE);
-            btnDeletePicture.setOnClickListener(clickerDeletePicture);
+                /* Set Bitmap to ImageView and Note */
+                imageView.setImageBitmap(imageBitmap);
+                note.setBitmap(imageBitmap);
 
-            /* Set Bitmap and ImagePath to Note */
-            note.setBitmap(imageBitmap);
+
+                /* Make imageView visivle */
+                imageView.setVisibility(View.VISIBLE);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 300, 1);
+                imageView.setLayoutParams(params);
+
+                /* Set up DeleteButton for Picture */
+                btnDeletePicture.setVisibility(View.VISIBLE);
+                btnDeletePicture.setOnClickListener(clickerDeletePicture);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Bild konnte nicht gespeichert werden!", Toast.LENGTH_SHORT).show();
+            }
         }
+    }
+
+    public String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = managedQuery(contentUri, proj, null, null, null);
+        int column_index = cursor
+                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
     }
 
     private void createAudioPlayer() {

@@ -1,7 +1,6 @@
 package emi.diary_app;
 
 import android.graphics.Bitmap;
-import android.os.Parcelable;
 import android.text.format.DateFormat;
 import android.widget.SeekBar;
 
@@ -9,6 +8,8 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Locale;
+
+import emi.diary_app.Database.Database;
 
 
 public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
@@ -27,8 +28,6 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
 
     protected transient Bitmap bitmap = null;
 
-    protected NoteType noteType;
-
     protected int playerDuration = 0;
 
 
@@ -44,7 +43,6 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
 
         this.ID = ID;
         this.title = title;
-        this.noteType = NoteType.TEXT;
     }
 
     public int getID() {
@@ -64,11 +62,6 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
         }
 
         this.title = title;
-    }
-
-    public NoteType getNoteType() {
-
-        return this.noteType;
     }
 
     public void setTextNote(String text) {
@@ -161,6 +154,7 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
         Calendar calendar = Calendar.getInstance(Locale.GERMAN);
         calendar.setTimeInMillis(this.timestamp);
         DateFormat dateFormat = new DateFormat();
+
 
         return dateFormat.format("hh:mm:ss, dd.MM.yyyy", calendar).toString() + " " + location;
     }

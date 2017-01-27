@@ -1,13 +1,20 @@
-package emi.diary_app;
+package emi.diary_app.ActionBar;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
+
+import java.io.File;
+import java.io.FileOutputStream;
+
+import emi.diary_app.Activity.ShareActivity;
+import emi.diary_app.Note;
+import emi.diary_app.R;
 
 
 public class ActionBarCallback_ShareActivity implements ActionMode.Callback {
@@ -51,12 +58,34 @@ public class ActionBarCallback_ShareActivity implements ActionMode.Callback {
 
         if (item.getItemId() == R.id.MenuShare_Share) {
 
+            /* Share TextContent */
             if (linLay_selectedItem.getId() == R.id.LinLayText) {
 
+                String toSend = note.getTitle() + "\n\n" + note.getTextNote() + "\n\n" + note.getDate_Location();
 
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, toSend);
+                sendIntent.setType("text/plain");
+                ((ShareActivity) context).startActivityForResult(sendIntent, SHARE_TEXT);
+
+            /* Share Image */
             } else if (linLay_selectedItem.getId() == R.id.LinLayPicture) {
 
+                try {
 
+                    // TODO: Noch keine ShareApp auswählbar
+                    File image = new File(note.getImageNote());
+                    Uri uri = Uri.fromFile(image);
+
+                    Intent share = new Intent(Intent.ACTION_SEND);
+                    share.putExtra(Intent.EXTRA_STREAM, uri);
+
+                    ((ShareActivity) context).startActivityForResult(Intent.createChooser(share, "Bild freigeben"), SHARE_PICTURE);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
 

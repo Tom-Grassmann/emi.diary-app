@@ -1,0 +1,182 @@
+package emi.diary_app.Activity;
+
+import android.app.ActionBar;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import emi.diary_app.Database.Database;
+import emi.diary_app.Note;
+import emi.diary_app.R;
+import emi.diary_app.ListManagement.TableManager;
+import emi.diary_app.Thread.LocalisationThread;
+
+public class MainActivity extends AppCompatActivity implements ActionBar.OnNavigationListener {
+
+    final static int EDIT_ENTRY = 1;
+    final static int ADD_ENTRY = 2;
+    final static int RESULT_OK_NO_LOCATION = 10;
+    private static final int LOCATION_FOUND = 20;
+    private static final int LOCATION_ERROR = 21;
+
+
+    private ListView listView;
+    private TableManager tableManager;
+    private Database database;
+    private ActionBar actionBar;
+
+    private Handler locHandler;
+    private Thread localisationThread;
+
+
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        InitializeApp();
+    }
+
+    public void InitializeApp() {
+
+        setContentView(R.layout.activity_main);
+
+        listView = (ListView) findViewById(R.id.tableDisplayEntry);
+
+        database = new Database(this);
+        tableManager = new TableManager(this, listView, database);
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.MenuSelected_AddEntry) {
+
+            Note note = new Note(database.getNextFreeID(), "New Entry");
+
+            Intent i = new Intent(MainActivity.this, EditEntryActivity.class);
+            i.putExtra("note", note);
+            i.putExtra("requestCode", ADD_ENTRY);
+
+            startActivityForResult(i, ADD_ENTRY);
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
+
+
+        if (resultCode == RESULT_OK) {
+
+
+            final Note note = (Note) data.getSerializableExtra("note");
+
+
+
+
+
+            /*if (note.getCity().equals("NO_LOCATION")) {
+
+                Toast.makeText(MainActivity.this, "Could not locate City, GPS disabled?", Toast.LENGTH_SHORT).show();
+            }*/
+
+            if (requestCode == EDIT_ENTRY) {
+
+                /* Decode Image from path */
+                Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
+                note.setBitmap(image);
+
+
+                if (tableManager.updateEntry(note)) {
+
+                    Toast.makeText(this, "Edit Confirmed!", Toast.LENGTH_SHORT).show();
+
+                } else {
+
+                    Toast.makeText(this, "Edit Failed!", Toast.LENGTH_SHORT).show();
+                }
+
+            } else if (requestCode == ADD_ENTRY) {
+
+                /* - - - - - - - Try to Set Location of Entry - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+                locHandler = new Handler() {
+
+                    @Override
+                    public void handleMessage(Message message) {
+
+                        int resultCode = message.getData().getInt("resultCode");
+                        String resultLocation = message.getData().getString("location");
+
+                        switch (resultCode) {
+
+                            case (LOCATION_FOUND): {
+
+                                note.setCity(resultLocation);
+                                tableManager.updateEntry(note);
+
+                                localisationThread.interrupt();
+
+                                break;
+                            }
+                            case (LOCATION_ERROR): {
+
+                                note.setCity("NO_LOCATION");
+                                tableManager.updateEntry(note);
+
+                                Toast.makeText(MainActivity.this, "Fehler beim ermitteln des Standortes!", Toast.LENGTH_SHORT).show();
+
+                                localisationThread.interrupt();
+
+                                break;
+                            }
+
+                        }
+                    }
+                };
+
+                localisationThread = new Thread(new LocalisationThread(MainActivity.this, locHandler));
+                localisationThread.start();
+                /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
+
+
+
+
+                /* Decode Image from path */
+                Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
+                note.setBitmap(image);
+
+                tableManager.addEntry(note);
+
+                Toast.makeText(this, "Neuer Eintrag hinzugefügt!", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    }
+
+
+    @Override
+    public boolean onNavigationItemSelected(int i, long l) {
+        return false;
+    }
+}

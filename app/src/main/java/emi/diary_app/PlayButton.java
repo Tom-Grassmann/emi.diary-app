@@ -6,11 +6,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 
-enum PlayState {
-
-    STOPPED, PLAYING, PAUSED
-}
-
 public class PlayButton extends Button {
 
     public PlayState state = PlayState.STOPPED;

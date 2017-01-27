@@ -1,4 +1,4 @@
-package emi.diary_app;
+package emi.diary_app.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Serializable;
 
+import emi.diary_app.Note;
+
 import static java.lang.Math.abs;
 
 public class Database extends SQLiteOpenHelper implements Serializable{
@@ -24,6 +26,7 @@ public class Database extends SQLiteOpenHelper implements Serializable{
     private static final String ID = "ID";
     private static final String TITLE = "TITLE";
     private static final String DATE = "DATE";
+    private static final String CITY = "CITY";
     private static final String CONTEXT_TEXT = "TEXT";
     private static final String CONTEXT_VOICE = "VOICE";
     private static final String CONTEXT_IMAGE = "IMAGE";
@@ -39,7 +42,7 @@ public class Database extends SQLiteOpenHelper implements Serializable{
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
         sqLiteDatabase.execSQL("create table " +TABLE_NAME+ " (ID INTEGER PRIMARY KEY, " +
-                               "TITLE TEXT, DATE TEXT, TEXT TEXT, VOICE TEXT, IMAGE TEXT)");
+                               "TITLE TEXT, DATE TEXT, CITY TEXT, TEXT TEXT, VOICE TEXT, IMAGE TEXT)");
     }
 
     @Override
@@ -61,6 +64,7 @@ public class Database extends SQLiteOpenHelper implements Serializable{
         contentValues.put(ID, this.getNextFreeID());
         contentValues.put(TITLE, note.getTitle());
         contentValues.put(DATE, String.valueOf(note.getTimestamp()));
+        contentValues.put(CITY, note.getCity());
         contentValues.put(CONTEXT_TEXT, note.getTextNote());
         contentValues.put(CONTEXT_VOICE, note.getVoiceNote());
         contentValues.put(CONTEXT_IMAGE, note.getImageNote());
@@ -83,6 +87,7 @@ public class Database extends SQLiteOpenHelper implements Serializable{
         contentValues.put(ID, note.getID());
         contentValues.put(TITLE, note.getTitle());
         contentValues.put(DATE, String.valueOf(note.getTimestamp()));
+        contentValues.put(CITY, note.getCity());
         contentValues.put(CONTEXT_TEXT, note.getTextNote());
         contentValues.put(CONTEXT_VOICE, note.getVoiceNote());
         contentValues.put(CONTEXT_IMAGE, note.getImageNote());
@@ -195,48 +200,4 @@ public class Database extends SQLiteOpenHelper implements Serializable{
 
         return id + 1;
     }
-
-    public String getTableAsString() {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        Log.d("DB:", "getTableAsString called");
-        String tableString = String.format("Table %s:\n", TABLE_NAME);
-        Cursor allRows  = db.rawQuery("SELECT ID FROM " + TABLE_NAME, null);
-        if (allRows.moveToFirst() ){
-            String[] columnNames = allRows.getColumnNames();
-            do {
-                for (String name: columnNames) {
-                    tableString += String.format("%s: %s\n", name,
-                            allRows.getString(allRows.getColumnIndex(name)));
-                }
-                tableString += "";
-
-            } while (allRows.moveToNext());
-        }
-
-        return tableString;
-    }
-
-
-    /* Write Image to internal Storage and extract the Path of it */
-    /*String picturePath = "";
-    if (note.getImageNote() != null) {
-
-        File internalStorage = appContext.getDir("Pictures", Context.MODE_PRIVATE);
-        File reportFilePath = new File(internalStorage, note.getID() + ".png");
-        picturePath = reportFilePath.toString();
-
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(reportFilePath);
-            note.getImageNote().compress(Bitmap.CompressFormat.PNG, 100 , fos);
-            fos.close();
-        }
-        catch (Exception ex) {
-            Log.i("DATABASE", "Problem updating picture", ex);
-            picturePath = "";
-        }
-    }*/
-
-
 }
