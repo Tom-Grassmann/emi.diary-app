@@ -1,12 +1,17 @@
 package emi.diary_app.Activity;
 
+import android.Manifest;
 import android.app.ActionBar;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,13 +25,20 @@ import emi.diary_app.R;
 import emi.diary_app.ListManagement.TableManager;
 import emi.diary_app.Thread.LocalisationThread;
 
-public class MainActivity extends AppCompatActivity implements ActionBar.OnNavigationListener {
+public class MainActivity extends AppCompatActivity {
 
     final static int EDIT_ENTRY = 1;
     final static int ADD_ENTRY = 2;
     final static int RESULT_OK_NO_LOCATION = 10;
-    private static final int LOCATION_FOUND = 20;
-    private static final int LOCATION_ERROR = 21;
+    final static int LOCATION_FOUND = 20;
+    final static int LOCATION_ERROR = 21;
+
+    final static int REQUEST_READ_EXTERNAL_STORAGE = 30;
+    final static int REQUEST_WRITE_EXTERNAL_STORAGE = 31;
+    final static int REQUEST_RECORD_AUDIO = 32;
+    final static int REQUEST_ACCESS_COARSE_LOCATION = 33;
+    final static int REQUEST_ACCESS_FINE_LOCATION = 34;
+
 
 
     private ListView listView;
@@ -38,14 +50,17 @@ public class MainActivity extends AppCompatActivity implements ActionBar.OnNavig
     private Thread localisationThread;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         InitializeApp();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            askForPermission();
+        }
     }
 
     public void InitializeApp() {
@@ -91,14 +106,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.OnNavig
 
             final Note note = (Note) data.getSerializableExtra("note");
 
-
-
-
-
-            /*if (note.getCity().equals("NO_LOCATION")) {
-
-                Toast.makeText(MainActivity.this, "Could not locate City, GPS disabled?", Toast.LENGTH_SHORT).show();
-            }*/
 
             if (requestCode == EDIT_ENTRY) {
 
@@ -174,9 +181,70 @@ public class MainActivity extends AppCompatActivity implements ActionBar.OnNavig
         }
     }
 
+    private void askForPermission() {
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE);
+            }
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
+            }
+        }
+
+    }
 
     @Override
-    public boolean onNavigationItemSelected(int i, long l) {
-        return false;
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_READ_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+
+                    Toast.makeText(this, "Please give Read Permission in Order to use the App!\n" +
+                            "Please restart App now.", Toast.LENGTH_LONG).show();
+
+
+                    // TODO: make App unusable when there is no Permission
+                    listView.setClickable(false);
+
+                }
+
+
+            }
+            case REQUEST_WRITE_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+
+                    Toast.makeText(this, "Please give Write Permission in Order to use the App!\n" +
+                            "Please restart App now.", Toast.LENGTH_LONG).show();
+
+                    listView.setClickable(false);
+                    closeOptionsMenu();
+                }
+            }
+
+        }
     }
 }

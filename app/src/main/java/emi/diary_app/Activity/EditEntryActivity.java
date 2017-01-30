@@ -296,11 +296,6 @@ public class EditEntryActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-                    System.out.println(Integer.toString(checkSelfPermission("GPS")));
-                }
-
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Images.Media.TITLE, Integer.toString(note.getID()));
                 values.put(MediaStore.Images.Media.DESCRIPTION, note.getTitle());

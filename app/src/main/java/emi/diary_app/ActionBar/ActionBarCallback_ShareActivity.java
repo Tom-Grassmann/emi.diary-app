@@ -4,13 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Environment;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import emi.diary_app.Activity.ShareActivity;
 import emi.diary_app.Note;
@@ -72,23 +75,48 @@ public class ActionBarCallback_ShareActivity implements ActionMode.Callback {
             /* Share Image */
             } else if (linLay_selectedItem.getId() == R.id.LinLayPicture) {
 
+                /*
                 try {
 
-                    // TODO: Noch keine ShareApp auswählbar
                     File image = new File(note.getImageNote());
                     Uri uri = Uri.fromFile(image);
 
-                    Intent share = new Intent(Intent.ACTION_SEND);
+                    Intent share = new Intent();
+                    share.setAction(Intent.ACTION_SEND);
                     share.putExtra(Intent.EXTRA_STREAM, uri);
+                    share.setType("image/*");
 
-                    ((ShareActivity) context).startActivityForResult(Intent.createChooser(share, "Bild freigeben"), SHARE_PICTURE);
+                    Intent chooser = Intent.createChooser(share, "Bild freigeben");
+
+                    if (share.resolveActivity(context.getPackageManager()) != null) {
+
+                        ((ShareActivity) context).startActivityForResult(chooser, SHARE_PICTURE);
+                    }
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-            }
+            }*/
 
+                Bitmap icon = note.getBitmap();
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.setType("image/jpeg");
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                icon.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "temporary_file.jpg");
+                try {
+                    f.createNewFile();
+                    FileOutputStream fo = new FileOutputStream(f);
+                    fo.write(bytes.toByteArray());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file:///sdcard/temporary_file.jpg"));
+                context.startActivity(Intent.createChooser(share, "Share Image"));
+
+            }
 
             this.linLay_selectedItem.setBackgroundColor(context.getResources().getColor(R.color.entry_not_selected));
             mode.finish();

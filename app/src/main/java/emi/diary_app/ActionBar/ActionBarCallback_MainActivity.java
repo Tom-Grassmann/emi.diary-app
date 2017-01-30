@@ -32,6 +32,8 @@ public class ActionBarCallback_MainActivity implements ActionMode.Callback {
 
         this.context = context;
         this.note = note;
+        this.note.setSelected(true);
+
         this.tableManager = tableManager;
         this.linLay_selectedItem = linLay_selectedItem;
 
@@ -121,6 +123,9 @@ public class ActionBarCallback_MainActivity implements ActionMode.Callback {
     @Override
     public void onDestroyActionMode(ActionMode mode) {
 
+        // TODO: multiple selection possible
+
+        this.note.setSelected(false);
         this.linLay_selectedItem.setBackgroundColor(context.getResources().getColor(R.color.entry_not_selected));
     }
 }

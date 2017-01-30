@@ -30,6 +30,8 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
 
     protected int playerDuration = 0;
 
+    protected boolean isSelected = false;
+
 
     public Note(int ID, String title) {
 
@@ -215,5 +217,13 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }

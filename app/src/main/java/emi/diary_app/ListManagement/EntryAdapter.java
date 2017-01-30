@@ -78,7 +78,16 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
 
         final LinearLayout entryLinLay = (LinearLayout) entry.findViewById(R.id.entry_linLay);
-        entryLinLay.setBackgroundColor(context.getResources().getColor(R.color.entry_not_selected));
+
+        /* If Entry is selected set Grrey Backround, else set white Backround */
+        if (note.isSelected()) {
+
+            entryLinLay.setBackgroundColor(context.getResources().getColor(R.color.entry_selected));
+
+        } else {
+
+            entryLinLay.setBackgroundColor(context.getResources().getColor(R.color.entry_not_selected));
+        }
 
         entryLinLay.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

@@ -62,6 +62,7 @@ public class ShareActivity extends AppCompatActivity {
 
             /* Set up ImageView */
             Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
+            note.setBitmap(image);
             imageView.setImageBitmap(image);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 300, 1);
             imageView.setLayoutParams(params);
