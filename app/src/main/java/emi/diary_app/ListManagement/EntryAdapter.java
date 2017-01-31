@@ -79,7 +79,7 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
         final LinearLayout entryLinLay = (LinearLayout) entry.findViewById(R.id.entry_linLay);
 
-        /* If Entry is selected set Grrey Backround, else set white Backround */
+        /* If Entry is selected set Grey Backround, else set White Backround */
         if (note.isSelected()) {
 
             entryLinLay.setBackgroundColor(context.getResources().getColor(R.color.entry_selected));
@@ -119,12 +119,12 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
             /* - - - Set up PlayButton - - - - - - - - - - - - - - - - - - - - - - - */
             final PlayButton playVoiceContent = new PlayButton(context);
             playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
-            playVoiceContent.setGravity(Gravity.CENTER_VERTICAL);
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(80, 80);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 6);
             params.setMargins(15, 15, 0, 15);
 
             playVoiceContent.setLayoutParams(params);
+            playVoiceContent.setGravity(Gravity.CENTER_VERTICAL);
 
             /* Add Button to Linear Layout */
             LinearLayout linearLayout = (LinearLayout) voiceEntry.findViewById(R.id.voiceEntryLinLay);
@@ -380,7 +380,7 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                 );
 
                 playerSeekBar.setProgress((int)startTime);
-                myHandler.postDelayed(this, 100);
+                myHandler.postDelayed(this, 5);
             }
         }
     };

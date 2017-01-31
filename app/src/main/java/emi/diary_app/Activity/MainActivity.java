@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -105,79 +106,85 @@ public class MainActivity extends AppCompatActivity {
 
 
             final Note note = (Note) data.getSerializableExtra("note");
+            note.setSelected(false);
 
 
-            if (requestCode == EDIT_ENTRY) {
+            switch (requestCode) {
 
-                /* Decode Image from path */
-                Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
-                note.setBitmap(image);
+                case (EDIT_ENTRY): {
+
+                    /* Decode Image from path */
+                    Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
+                    note.setBitmap(image);
 
 
-                if (tableManager.updateEntry(note)) {
+                    if (tableManager.updateEntry(note)) {
 
-                    Toast.makeText(this, "Edit Confirmed!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Änderungen gespeichert!", Toast.LENGTH_SHORT).show();
 
-                } else {
+                    } else {
 
-                    Toast.makeText(this, "Edit Failed!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Eintrag konnte nicht gespeichert werden!", Toast.LENGTH_SHORT).show();
+                    }
+
+                    break;
                 }
 
-            } else if (requestCode == ADD_ENTRY) {
+                case (ADD_ENTRY): {
 
-                /* - - - - - - - Try to Set Location of Entry - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                    /* - - - - - - - Try to Set Location of Entry - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-                locHandler = new Handler() {
+                    locHandler = new Handler() {
 
-                    @Override
-                    public void handleMessage(Message message) {
+                        @Override
+                        public void handleMessage(Message message) {
 
-                        int resultCode = message.getData().getInt("resultCode");
-                        String resultLocation = message.getData().getString("location");
+                            int resultCode = message.getData().getInt("resultCode");
+                            String resultLocation = message.getData().getString("location");
 
-                        switch (resultCode) {
+                            switch (resultCode) {
 
-                            case (LOCATION_FOUND): {
+                                case (LOCATION_FOUND): {
 
-                                note.setCity(resultLocation);
-                                tableManager.updateEntry(note);
+                                    note.setCity(resultLocation);
+                                    tableManager.updateEntry(note);
 
-                                localisationThread.interrupt();
+                                    localisationThread.interrupt();
 
-                                break;
+                                    break;
+                                }
+                                case (LOCATION_ERROR): {
+
+                                    note.setCity("NO_LOCATION");
+                                    tableManager.updateEntry(note);
+
+                                    Toast.makeText(MainActivity.this, "Fehler beim ermitteln des Standortes!", Toast.LENGTH_SHORT).show();
+
+                                    localisationThread.interrupt();
+
+                                    break;
+                                }
+
                             }
-                            case (LOCATION_ERROR): {
-
-                                note.setCity("NO_LOCATION");
-                                tableManager.updateEntry(note);
-
-                                Toast.makeText(MainActivity.this, "Fehler beim ermitteln des Standortes!", Toast.LENGTH_SHORT).show();
-
-                                localisationThread.interrupt();
-
-                                break;
-                            }
-
                         }
-                    }
-                };
+                    };
 
-                localisationThread = new Thread(new LocalisationThread(MainActivity.this, locHandler));
-                localisationThread.start();
-                /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
-
+                    localisationThread = new Thread(new LocalisationThread(MainActivity.this, locHandler));
+                    localisationThread.start();
+                    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 
+                    /* Decode Image from path */
+                    Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
+                    note.setBitmap(image);
 
-                /* Decode Image from path */
-                Bitmap image = BitmapFactory.decodeFile(note.getImageNote());
-                note.setBitmap(image);
+                    tableManager.addEntry(note);
 
-                tableManager.addEntry(note);
+                    Toast.makeText(this, "Neuer Eintrag hinzugefügt!", Toast.LENGTH_SHORT).show();
 
-                Toast.makeText(this, "Neuer Eintrag hinzugefügt!", Toast.LENGTH_SHORT).show();
+                    break;
+                }
             }
-
         }
     }
 
@@ -187,12 +194,6 @@ public class MainActivity extends AppCompatActivity {
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
 
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-            } else {
-
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE);
             }
         }
@@ -200,12 +201,6 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-            } else {
 
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
             }
@@ -226,8 +221,10 @@ public class MainActivity extends AppCompatActivity {
 
 
                     // TODO: make App unusable when there is no Permission
-                    listView.setClickable(false);
 
+                    CoordinatorLayout mainLayout = (CoordinatorLayout) MainActivity.this.findViewById(R.id.Main_Layout_Main);
+                    mainLayout.setClickable(false);
+                    mainLayout.setEnabled(false);
                 }
 
 

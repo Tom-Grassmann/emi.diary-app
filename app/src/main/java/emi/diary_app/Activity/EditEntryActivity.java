@@ -1,11 +1,13 @@
 package emi.diary_app.Activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,9 +17,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +50,10 @@ public class EditEntryActivity extends AppCompatActivity {
 
     static final int PICK_IMAGE = 2;
     static final int REQUEST_IMAGE_CAPTURE = 3;
+
+    final static int REQUEST_RECORD_AUDIO = 32;
+    final static int REQUEST_ACCESS_COARSE_LOCATION = 33;
+    final static int REQUEST_ACCESS_FINE_LOCATION = 34;
 
     private EditText
             editTitle,
@@ -78,6 +87,8 @@ public class EditEntryActivity extends AppCompatActivity {
     private boolean AUDIOPLAYER_VISIBLE = false;
     private boolean AUDIO_PLAYING = false;
 
+    /* PermissionState */
+    boolean PERM_RECORD_AUDIO = true;
 
     private File audioFile = null;
 
@@ -96,6 +107,40 @@ public class EditEntryActivity extends AppCompatActivity {
     public EditEntryActivity() {
     }
 
+    private void askForPermission(int REQUEST_CODE) {
+
+        switch (REQUEST_CODE) {
+
+            case (REQUEST_RECORD_AUDIO): {
+
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
+                }
+            }
+        }
+
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_RECORD_AUDIO: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+
+                    Toast.makeText(this, "Bitte erlauben sie den Zugriff auf das Mikrofon, um Audio aufnehmen zu können!", Toast.LENGTH_LONG).show();
+                }
+
+
+            }
+
+
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +154,9 @@ public class EditEntryActivity extends AppCompatActivity {
         this.setContentView(R.layout.activity_edit_entry);
 
         InitializeActivity();
+
+
+
     }
 
     public void InitializeActivity() {
@@ -252,6 +300,9 @@ public class EditEntryActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_DOWN:
                         view.setPressed(true);
 
+                        askForPermission(REQUEST_RECORD_AUDIO);
+
+
                         /* Start Audio Record */
                         try {
                             startRecord();
@@ -268,15 +319,19 @@ public class EditEntryActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_CANCEL:
                         view.setPressed(false);
 
-                        /* Stop Audio Record and Create Audio Player */
-                        try {
-                            stopRecord();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        createAudioPlayer();
+                        if (ContextCompat.checkSelfPermission(EditEntryActivity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
 
-                        /* Set up OnRecord Icon */
+                            /* Stop Audio Record and Create Audio Player */
+                            try {
+                                stopRecord();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            createAudioPlayer();
+
+                        }
+
+                        /* Reset Record Icon */
                         btnRecordAudio.setImageDrawable(getResources().getDrawable(R.drawable.ic_microfphone));
 
                         break;
@@ -439,16 +494,13 @@ public class EditEntryActivity extends AppCompatActivity {
         final PlayButton playVoiceContent = new PlayButton(this);
         playVoiceContent.setBackground(this.getResources().getDrawable(R.drawable.ic_media_play));
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(80, 80);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, (float) 4.5);
         params.setMargins(15, 15, 0, 15);
 
         playVoiceContent.setLayoutParams(params);
+        playVoiceContent.setGravity(Gravity.CENTER_VERTICAL);
 
-        /* Add Button to Linear Layout */
         LinearLayout linearLayout = (LinearLayout) voiceEntry.findViewById(R.id.voiceEntryLinLay);
-        params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.setMargins(5, 10, 5, 10);
-        linearLayout.setLayoutParams(params);
         linearLayout.addView(playVoiceContent, 0);
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -683,7 +735,7 @@ public class EditEntryActivity extends AppCompatActivity {
                 );
 
                 playerSeekBar.setProgress((int)startTime);
-                myHandler.postDelayed(this, 100);
+                myHandler.postDelayed(this, 5);
             }
         }
     };
