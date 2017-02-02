@@ -3,20 +3,33 @@ package emi.diary_app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.view.ActionMode;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
+import emi.diary_app.Activity.EditEntryActivity;
 import emi.diary_app.Activity.ShareActivity;
 import emi.diary_app.Note;
+import emi.diary_app.PlayButton;
+import emi.diary_app.PlayState;
 import emi.diary_app.R;
 
 
@@ -75,30 +88,6 @@ public class ActionBarCallback_ShareActivity implements ActionMode.Callback {
             /* Share Image */
             } else if (linLay_selectedItem.getId() == R.id.LinLayPicture) {
 
-                /*
-                try {
-
-                    File image = new File(note.getImageNote());
-                    Uri uri = Uri.fromFile(image);
-
-                    Intent share = new Intent();
-                    share.setAction(Intent.ACTION_SEND);
-                    share.putExtra(Intent.EXTRA_STREAM, uri);
-                    share.setType("image/*");
-
-                    Intent chooser = Intent.createChooser(share, "Bild freigeben");
-
-                    if (share.resolveActivity(context.getPackageManager()) != null) {
-
-                        ((ShareActivity) context).startActivityForResult(chooser, SHARE_PICTURE);
-                    }
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }*/
 
                 Bitmap icon = note.getBitmap();
                 Intent share = new Intent(Intent.ACTION_SEND);
@@ -116,6 +105,16 @@ public class ActionBarCallback_ShareActivity implements ActionMode.Callback {
                 share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file:///sdcard/temporary_file.jpg"));
                 context.startActivity(Intent.createChooser(share, "Share Image"));
 
+            } else if (linLay_selectedItem.getId() == R.id.LinLayAudioPlayer) {
+
+                // TODO Notes lassen sich schwer anklicken
+                // TODO: Kopieren auf SD Card -> kein zugriff auf Appinterne Daten
+
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.setType("audio/3gp");
+                share.putExtra(Intent.EXTRA_STREAM, Uri.parse(note.getVoiceNote()));
+                context.startActivity(Intent.createChooser(share, "Share Audio"));
+
             }
 
             this.linLay_selectedItem.setBackgroundColor(context.getResources().getColor(R.color.entry_not_selected));
@@ -132,4 +131,5 @@ public class ActionBarCallback_ShareActivity implements ActionMode.Callback {
 
         this.linLay_selectedItem.setBackgroundColor(context.getResources().getColor(R.color.entry_not_selected));
     }
+
 }
