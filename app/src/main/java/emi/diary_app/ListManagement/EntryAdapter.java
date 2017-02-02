@@ -1,12 +1,16 @@
 package emi.diary_app.ListManagement;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,6 +43,11 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
     private MediaPlayer mediaPlayer = null;
     private int actualNotePlaying = -1;
 
+    private ActionMode actionMode = null;
+    private ActionBarCallback_MainActivity actionBar = null;
+
+    private View selectedTextContent = null;
+
     public EntryAdapter(Context context, ArrayList<Note> noteList, TableManager tableManager) {
         this.context = context;
         this.noteList = noteList;
@@ -60,9 +69,14 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
         return i;
     }
 
+    public void setActionBar(ActionMode mode) {
+
+        actionMode = mode;
+    }
 
     @Override
     public View getView(int pos, View view, ViewGroup viewGroup) {
+
 
         final Note note = noteList.get(pos);
 
@@ -76,6 +90,15 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
         tvTitle.setText(note.getTitle());
         tvDate.setText(note.getDate_Location());
 
+        LinearLayout entryText = (LinearLayout) entry.findViewById(R.id.entryText);
+        final LinearLayout entryVoice = (LinearLayout) entry.findViewById(R.id.entryVoice);
+        LinearLayout entryImage = (LinearLayout) entry.findViewById(R.id.entryImage);
+
+        /* Setting up TextEntry */
+        final View textEntry = View.inflate(context, R.layout.diary_entry_text, null);
+        final TextView textContent = (TextView) textEntry.findViewById(R.id.textContent);
+        textContent.setText(note.getTextNote());
+        textContent.setMaxHeight(300);
 
         final LinearLayout entryLinLay = (LinearLayout) entry.findViewById(R.id.entry_linLay);
 
@@ -93,22 +116,22 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
             @Override
             public boolean onLongClick(View view) {
 
-                ((MainActivity) context).startActionMode(new ActionBarCallback_MainActivity(tableManager, context, note, entryLinLay));
+
+                if (actionMode != null) {
+
+                    actionMode.finish();
+                }
+
+                actionBar = new ActionBarCallback_MainActivity(textContent, EntryAdapter.this, tableManager, context, note, entryLinLay);
+                ((MainActivity) context).startActionMode(actionBar);
+
 
                 return false;
             }
         });
 
 
-        LinearLayout entryText = (LinearLayout) entry.findViewById(R.id.entryText);
-        final LinearLayout entryVoice = (LinearLayout) entry.findViewById(R.id.entryVoice);
-        LinearLayout entryImage = (LinearLayout) entry.findViewById(R.id.entryImage);
 
-        /* Setting up TextEntry */
-        View textEntry = View.inflate(context, R.layout.diary_entry_text, null);
-        TextView textContent = (TextView) textEntry.findViewById(R.id.textContent);
-        textContent.setText(note.getTextNote());
-        textContent.setMaxHeight(300);
 
         /* Setting up VoiceEntry */
         View voiceEntry = null;
@@ -384,4 +407,6 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
             }
         }
     };
+
+
 }

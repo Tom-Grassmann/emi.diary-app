@@ -14,10 +14,12 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import emi.diary_app.Database.Database;
@@ -62,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
 
             askForPermission();
         }
+
+
+
     }
 
     public void InitializeApp() {
@@ -222,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // TODO: make App unusable when there is no Permission
 
-                    CoordinatorLayout mainLayout = (CoordinatorLayout) MainActivity.this.findViewById(R.id.Main_Layout_Main);
+                    RelativeLayout mainLayout = (RelativeLayout) MainActivity.this.findViewById(R.id.Main_Layout_Main);
                     mainLayout.setClickable(false);
                     mainLayout.setEnabled(false);
                 }
