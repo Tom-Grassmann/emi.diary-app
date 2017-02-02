@@ -49,11 +49,11 @@ import emi.diary_app.R;
 public class EditEntryActivity extends AppCompatActivity {
 
     static final int PICK_IMAGE = 2;
-    static final int REQUEST_IMAGE_CAPTURE = 3;
+    static final int IMAGE_CAPTURE = 3;
+    final static int REQUEST_RECORD_AUDIO= 32;
+    final static int REQUEST_IMAGE_CAPTURE = 35;
 
-    final static int REQUEST_RECORD_AUDIO = 32;
-    final static int REQUEST_ACCESS_COARSE_LOCATION = 33;
-    final static int REQUEST_ACCESS_FINE_LOCATION = 34;
+
 
     private EditText
             editTitle,
@@ -117,6 +117,16 @@ public class EditEntryActivity extends AppCompatActivity {
 
                         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
                 }
+                break;
+            }
+
+            case (REQUEST_IMAGE_CAPTURE): {
+
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_IMAGE_CAPTURE);
+                }
+                break;
             }
         }
 
@@ -134,7 +144,18 @@ public class EditEntryActivity extends AppCompatActivity {
                     Toast.makeText(this, "Bitte erlauben sie den Zugriff auf das Mikrofon, um Audio aufnehmen zu können!", Toast.LENGTH_LONG).show();
                 }
 
+                break;
+            }
 
+            case REQUEST_IMAGE_CAPTURE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+
+                    Toast.makeText(this, "Bitte erlauben sie den Zugriff auf die Kamera, um Fotos aufnehmen zu können!", Toast.LENGTH_LONG).show();
+                }
+
+                break;
             }
 
 
@@ -351,14 +372,28 @@ public class EditEntryActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                /*if (ContextCompat.checkSelfPermission(EditEntryActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+                    askForPermission(REQUEST_IMAGE_CAPTURE);
+
+                } else {
+
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.Images.Media.TITLE, Integer.toString(note.getID()));
+                    values.put(MediaStore.Images.Media.DESCRIPTION, note.getTitle());
+                    imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                    startActivityForResult(intent, IMAGE_CAPTURE);
+                }*/
+
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Images.Media.TITLE, Integer.toString(note.getID()));
                 values.put(MediaStore.Images.Media.DESCRIPTION, note.getTitle());
-                imageUri = getContentResolver().insert(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                startActivityForResult(intent, IMAGE_CAPTURE);
 
             }
         });
@@ -447,7 +482,7 @@ public class EditEntryActivity extends AppCompatActivity {
             }
         }
 
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+        if (requestCode == IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
             try {
 

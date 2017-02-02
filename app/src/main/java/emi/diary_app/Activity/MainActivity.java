@@ -62,7 +62,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-            askForPermission();
+            askForPermission(REQUEST_READ_EXTERNAL_STORAGE);
+            askForPermission(REQUEST_WRITE_EXTERNAL_STORAGE);
+
         }
 
 
@@ -138,44 +140,52 @@ public class MainActivity extends AppCompatActivity {
                 case (ADD_ENTRY): {
 
                     /* - - - - - - - Try to Set Location of Entry - - - - - - - - - - - - - - - - - - - - - - - - - - */
+                    /* Check for localisationPermission */
+                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
 
-                    locHandler = new Handler() {
+                        askForPermission(REQUEST_ACCESS_COARSE_LOCATION);
+                        askForPermission(REQUEST_ACCESS_FINE_LOCATION);
 
-                        @Override
-                        public void handleMessage(Message message) {
+                    } else {
 
-                            int resultCode = message.getData().getInt("resultCode");
-                            String resultLocation = message.getData().getString("location");
+                        locHandler = new Handler() {
 
-                            switch (resultCode) {
+                            @Override
+                            public void handleMessage(Message message) {
 
-                                case (LOCATION_FOUND): {
+                                int resultCode = message.getData().getInt("resultCode");
+                                String resultLocation = message.getData().getString("location");
 
-                                    note.setCity(resultLocation);
-                                    tableManager.updateEntry(note);
+                                switch (resultCode) {
 
-                                    localisationThread.interrupt();
+                                    case (LOCATION_FOUND): {
 
-                                    break;
+                                        note.setCity(resultLocation);
+                                        tableManager.updateEntry(note);
+
+                                        localisationThread.interrupt();
+
+                                        break;
+                                    }
+                                    case (LOCATION_ERROR): {
+
+                                        note.setCity("NO_LOCATION");
+                                        tableManager.updateEntry(note);
+
+                                        Toast.makeText(MainActivity.this, "Fehler beim ermitteln des Standortes!", Toast.LENGTH_SHORT).show();
+
+                                        localisationThread.interrupt();
+
+                                        break;
+                                    }
+
                                 }
-                                case (LOCATION_ERROR): {
-
-                                    note.setCity("NO_LOCATION");
-                                    tableManager.updateEntry(note);
-
-                                    Toast.makeText(MainActivity.this, "Fehler beim ermitteln des Standortes!", Toast.LENGTH_SHORT).show();
-
-                                    localisationThread.interrupt();
-
-                                    break;
-                                }
-
                             }
-                        }
-                    };
+                        };
 
-                    localisationThread = new Thread(new LocalisationThread(MainActivity.this, locHandler));
-                    localisationThread.start();
+                        localisationThread = new Thread(new LocalisationThread(MainActivity.this, locHandler));
+                        localisationThread.start();
+                    }
                     /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 
 
@@ -193,25 +203,57 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void askForPermission() {
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+    private void askForPermission(int REQUEST_CODE) {
 
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+        switch (REQUEST_CODE) {
 
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE);
+            case (REQUEST_READ_EXTERNAL_STORAGE): {
+
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE);
+
+                }
+                break;
+            }
+
+            case (REQUEST_WRITE_EXTERNAL_STORAGE): {
+
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
+
+                }
+                break;
+            }
+
+            case (REQUEST_ACCESS_COARSE_LOCATION): {
+
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ACCESS_COARSE_LOCATION);
+
+                }
+                break;
+            }
+
+            case (REQUEST_ACCESS_FINE_LOCATION): {
+
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_ACCESS_FINE_LOCATION);
+                }
+                break;
             }
         }
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
-            }
-        }
-
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
@@ -232,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
                     mainLayout.setEnabled(false);
                 }
 
-
+                break;
             }
             case REQUEST_WRITE_EXTERNAL_STORAGE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -245,8 +287,31 @@ public class MainActivity extends AppCompatActivity {
                     listView.setClickable(false);
                     closeOptionsMenu();
                 }
+                break;
+            }
+            case REQUEST_ACCESS_COARSE_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+
+                    Toast.makeText(this, "Bitte erlauben Sie die Ortung um das ermitteln des Standortes zu ermöglichen!", Toast.LENGTH_LONG).show();
+                }
+
+                break;
+            }
+            case REQUEST_ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+
+                    Toast.makeText(this, "Bitte erlauben Sie die Ortung um das ermitteln des Standortes zu ermöglichen!", Toast.LENGTH_LONG).show();
+                }
+
+                break;
             }
 
         }
     }
+
+
 }

@@ -137,13 +137,6 @@ public class ActionBarCallback_MainActivity implements ActionMode.Callback {
             this.linLay_selectedItem.setBackgroundColor(context.getResources().getColor(R.color.entry_not_selected));
             mode.finish();
 
-        } else if (id == R.id.test) {
-
-            /* Animate TextContent Collapse */
-            if (!note.getTextNote().equals("")) {
-
-                collapse(textContent, textContent.getLineHeight() * textContent.getLineCount());
-            }
         }
 
 
@@ -234,7 +227,16 @@ public class ActionBarCallback_MainActivity implements ActionMode.Callback {
     }
 
     private void collapse(final View v, final int startHeight) {
-        int finalHeight = v.getHeight() + 300 - startHeight;
+
+        int normalSize = 300;
+
+        if (((TextView) v).getLineCount() < 10) {
+
+            normalSize = ((TextView) v).getLineCount() * ((TextView) v).getLineHeight();
+        }
+
+
+        int finalHeight = v.getHeight() + normalSize - startHeight;
 
         System.out.println(startHeight);
 
