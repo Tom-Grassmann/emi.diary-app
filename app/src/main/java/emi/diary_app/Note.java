@@ -153,12 +153,12 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
             }
         }
 
-        Calendar calendar = Calendar.getInstance(Locale.GERMAN);
+        Calendar calendar = Calendar.getInstance(Locale.GERMANY);
         calendar.setTimeInMillis(this.timestamp);
         DateFormat dateFormat = new DateFormat();
 
 
-        return dateFormat.format("hh:mm:ss, dd.MM.yyyy", calendar).toString() + " " + location;
+        return dateFormat.format("HH:mm:ss, dd.MM.yyyy", calendar).toString() + " " + location;
     }
 
 
