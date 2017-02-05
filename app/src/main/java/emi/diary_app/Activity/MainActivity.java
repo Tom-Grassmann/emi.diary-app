@@ -18,6 +18,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -43,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
     final static int REQUEST_ACCESS_FINE_LOCATION = 34;
 
 
-
     private ListView listView;
     private TableManager tableManager;
     private Database database;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
             askForPermission(REQUEST_WRITE_EXTERNAL_STORAGE);
 
         }
+
 
 
 
@@ -141,9 +143,12 @@ public class MainActivity extends AppCompatActivity {
 
                     /* - - - - - - - Try to Set Location of Entry - - - - - - - - - - - - - - - - - - - - - - - - - - */
                     /* Check for localisationPermission */
-                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
                         askForPermission(REQUEST_ACCESS_COARSE_LOCATION);
+
+                    } else if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
                         askForPermission(REQUEST_ACCESS_FINE_LOCATION);
 
                     } else {

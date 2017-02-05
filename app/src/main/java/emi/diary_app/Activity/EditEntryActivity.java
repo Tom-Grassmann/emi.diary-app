@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -39,6 +40,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import emi.diary_app.Note;
@@ -53,8 +55,6 @@ public class EditEntryActivity extends AppCompatActivity {
     final static int REQUEST_RECORD_AUDIO= 32;
     final static int REQUEST_IMAGE_CAPTURE = 35;
 
-
-
     private EditText
             editTitle,
             editTextContent;
@@ -64,6 +64,7 @@ public class EditEntryActivity extends AppCompatActivity {
 
     private ImageButton
             btnSaveEntry,
+            btnReadEntry,
             btnAddPicture,
             btnRecordAudio,
             btnTakePicture,
@@ -81,6 +82,7 @@ public class EditEntryActivity extends AppCompatActivity {
 
     private Uri imageUri;
 
+    private TextToSpeech textToSpeech;
 
 
     private boolean RECORDING = false;
@@ -217,7 +219,7 @@ public class EditEntryActivity extends AppCompatActivity {
         }
 
         File internalStorage = this.getDir("Audio", Context.MODE_PRIVATE);
-        audioFile = new File(internalStorage, note.getID() + ".3gp");
+        audioFile = new File(internalStorage, note.getID() + ".3gpp");
 
 
 
@@ -241,7 +243,7 @@ public class EditEntryActivity extends AppCompatActivity {
                     String picturePath = "";
 
                     File internalStorage = getDir("Pictures", Context.MODE_PRIVATE);
-                    File reportFilePath = new File(internalStorage, note.getID() + ".png");
+                    File reportFilePath = new File(internalStorage, note.getID() + ".jpeg");
                     picturePath = reportFilePath.toString();
 
                     FileOutputStream fos = null;
@@ -527,7 +529,12 @@ public class EditEntryActivity extends AppCompatActivity {
 
          /* - - - Set up PlayButton - - - - - - - - - - - - - - - - - - - - - - - */
         final PlayButton playVoiceContent = new PlayButton(this);
-        playVoiceContent.setBackground(this.getResources().getDrawable(R.drawable.ic_media_play));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+
+        } else {
+            playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_play));
+        }
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, (float) 4.5);
         params.setMargins(15, 15, 0, 15);
@@ -571,7 +578,12 @@ public class EditEntryActivity extends AppCompatActivity {
 
                             mediaPlayer.pause();
 
-                            playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+
+                            } else {
+                                playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_play));
+                            }
 
                             AUDIO_PLAYING = false;
 
@@ -591,8 +603,12 @@ public class EditEntryActivity extends AppCompatActivity {
                             mediaPlayer.seekTo(playerSeekBar.getProgress());
 
                             /* Set up "Play" Icon */
-                            playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
 
+                            } else {
+                                playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_pause));
+                            }
                             mediaPlayer.start();
 
                              /* SeekBar updation */
@@ -636,7 +652,12 @@ public class EditEntryActivity extends AppCompatActivity {
             if (playVoiceContent.state == PlayState.PLAYING) {
 
                 /* Set up "Pause" Icon */
-                playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+
+                } else {
+                    playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_play));
+                }
 
                 /* Pause Audio */
                 mediaPlayer.pause();
@@ -647,8 +668,12 @@ public class EditEntryActivity extends AppCompatActivity {
             } else if (playVoiceContent.state == PlayState.STOPPED){
 
                 /* Set up "Play" Icon */
-                playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
 
+                } else {
+                    playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_pause));
+                }
 
                 /* - - - Preparing MediaPlayer - - - - - - - - - - - - - - - - - - - - - */
                 mediaPlayer = new MediaPlayer();
@@ -680,7 +705,12 @@ public class EditEntryActivity extends AppCompatActivity {
                         playerSeekBar.setProgress(0);
 
                         /* Set up "Pause" Icon */
-                        playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+
+                        } else {
+                            playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_play));
+                        }
 
                         /* Reset LastPlayedDuration in Note */
                         note.setLastPlayedDuration(0);
@@ -709,8 +739,12 @@ public class EditEntryActivity extends AppCompatActivity {
             } else if (playVoiceContent.state == PlayState.PAUSED) {
 
                 /* Set up "Play" Icon */
-                playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
 
+                } else {
+                    playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_pause));
+                }
                 mediaPlayer.start();
 
                 /* SeekBar updation */
@@ -780,6 +814,23 @@ public class EditEntryActivity extends AppCompatActivity {
         btnSaveEntry = (ImageButton) findViewById(R.id.btnSaveEntry);
         btnRecordAudio = (ImageButton) findViewById(R.id.btnRecordAudio);
         btnTakePicture = (ImageButton) findViewById(R.id.btnTakePicture);
+
+        btnReadEntry = (ImageButton) findViewById(R.id.btnReadEntry);
+        btnReadEntry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                textToSpeech = new TextToSpeech(EditEntryActivity.this, new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(int i) {
+
+                        textToSpeech.setLanguage(Locale.GERMAN);
+                        textToSpeech.speak(editTitle.getText().toString(), TextToSpeech.QUEUE_FLUSH, null);
+                        textToSpeech.speak(editTextContent.getText().toString(), TextToSpeech.QUEUE_ADD, null);
+                    }
+                });
+            }
+        });
 
         btnDeleteText = (ImageButton) findViewById(R.id.btnDeleteText);
         btnDeletePicture = (ImageButton) findViewById(R.id.btnDeletePicture);

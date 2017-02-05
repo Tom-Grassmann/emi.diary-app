@@ -20,6 +20,8 @@
         android:layout_height="55dp">
         >
 
+
+
         <SeekBar
             style="@style/SeekBarAppTheme"
             android:layout_width="match_parent"

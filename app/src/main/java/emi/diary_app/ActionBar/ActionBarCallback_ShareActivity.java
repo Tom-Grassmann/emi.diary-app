@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.FileProvider;
 import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.Menu;
@@ -107,13 +108,16 @@ public class ActionBarCallback_ShareActivity implements ActionMode.Callback {
 
             } else if (linLay_selectedItem.getId() == R.id.LinLayAudioPlayer) {
 
-                // TODO Notes lassen sich schwer anklicken
-                // TODO: Kopieren auf SD Card -> kein zugriff auf Appinterne Daten
+                File fa = new File(note.getVoiceNote());
+                Uri audioUri = FileProvider.getUriForFile(context, "emi.diary_app.fileProvider", fa);
 
-                Intent share = new Intent(Intent.ACTION_SEND);
-                share.setType("audio/3gp");
-                share.putExtra(Intent.EXTRA_STREAM, Uri.parse(note.getVoiceNote()));
-                context.startActivity(Intent.createChooser(share, "Share Audio"));
+                Intent shareIntenta = new Intent();
+                shareIntenta.setAction(Intent.ACTION_SEND);
+                shareIntenta.setType("audio/*");
+                shareIntenta.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                shareIntenta.setDataAndType(audioUri, context.getContentResolver().getType(audioUri));
+                shareIntenta.putExtra(Intent.EXTRA_STREAM, audioUri);
+                context.startActivity(Intent.createChooser(shareIntenta, "Audio senden mit"));
 
             }
 

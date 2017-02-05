@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -45,6 +46,7 @@ public class ShareActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private boolean AUDIO_PLAYING = false;
     private boolean AUDIOPLAYER_VISIBLE = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,7 +150,7 @@ public class ShareActivity extends AppCompatActivity {
         final PlayButton playVoiceContent = new PlayButton(this);
         playVoiceContent.setBackground(this.getResources().getDrawable(R.drawable.ic_media_play));
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, (float) 4.5);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, (float) 5.5);
         params.setMargins(15, 15, 0, 15);
 
         playVoiceContent.setLayoutParams(params);

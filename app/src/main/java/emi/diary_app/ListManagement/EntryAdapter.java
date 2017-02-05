@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Handler;
 import android.view.ActionMode;
 import android.view.Gravity;
@@ -141,7 +142,12 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
             /* - - - Set up PlayButton - - - - - - - - - - - - - - - - - - - - - - - */
             final PlayButton playVoiceContent = new PlayButton(context);
-            playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
+
+            } else {
+                playVoiceContent.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_media_play));
+            }
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 6);
             params.setMargins(15, 15, 0, 15);
@@ -172,7 +178,12 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
                                 mediaPlayer.pause();
 
-                                playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                    playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
+
+                                } else {
+                                    playVoiceContent.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_media_play));
+                                }
 
                                 actualNotePlaying = -1;
 
@@ -191,8 +202,13 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
 
                                 mediaPlayer.seekTo(playerSeekBar.getProgress());
 
-                                /* Set up "Play" Icon */
-                                playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
+                                /* Set up "Pause" Icon */
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                    playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
+
+                                } else {
+                                    playVoiceContent.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_media_pause));
+                                }
 
                                 mediaPlayer.start();
 
@@ -241,8 +257,12 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                 if (mediaPlayer.isPlaying()) {
 
                     playVoiceContent.setPlaying();
-                    playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
 
+                    } else {
+                        playVoiceContent.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_media_pause));
+                    }
 
                     // TODO: Update SeekBar when Audio was paused
                     // TODO: And List scrolled down
@@ -264,8 +284,13 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                     /* If Audio is playing */
                     if (playVoiceContent.state == PlayState.PLAYING) {
 
-                        /* Set up "Pause" Icon */
-                        playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
+                        /* Set up "Play" Icon */
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
+
+                        } else {
+                            playVoiceContent.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_media_play));
+                        }
 
                         /* Pause Audio */
                         mediaPlayer.pause();
@@ -277,8 +302,12 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                     } else if (playVoiceContent.state == PlayState.STOPPED && actualNotePlaying == -1){
 
                         /* Set up "Play" Icon */
-                        playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
 
+                        } else {
+                            playVoiceContent.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_media_pause));
+                        }
 
                         // TODO: Stop Player if there are Playing other Audios
 
@@ -308,7 +337,12 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                                 playerSeekBar.setProgress(0);
 
                                 /* Set up "Pause" Icon */
-                                playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                    playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_play));
+
+                                } else {
+                                    playVoiceContent.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_media_play));
+                                }
 
                                  /* Reset LastPlayedDuration in Note */
                                 note.setLastPlayedDuration(0);
@@ -342,7 +376,12 @@ public class EntryAdapter extends BaseAdapter implements Serializable{
                     } else if (playVoiceContent.state == PlayState.PAUSED) {
 
                         /* Set up "Play" Icon */
-                        playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            playVoiceContent.setBackground(context.getResources().getDrawable(R.drawable.ic_media_pause));
+
+                        } else {
+                            playVoiceContent.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_media_pause));
+                        }
 
                         mediaPlayer.start();
                         actualNotePlaying = note.getID();

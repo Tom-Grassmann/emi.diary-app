@@ -12,6 +12,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.Message;
+import android.speech.tts.TextToSpeech;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +21,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Locale;
+
 import emi.diary_app.Activity.EditEntryActivity;
 import emi.diary_app.Activity.MainActivity;
 import emi.diary_app.Activity.ShareActivity;
@@ -43,9 +47,9 @@ public class ActionBarCallback_MainActivity implements ActionMode.Callback {
     private EntryAdapter entryAdapter;
     private TextView textContent;
 
-    private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
-    private ShakeDetector mShakeDetector;
+    private TextToSpeech textToSpeech;
+
+    private ActionMode mode;
 
     ShakeDetector shakeDetector;
 
@@ -65,7 +69,7 @@ public class ActionBarCallback_MainActivity implements ActionMode.Callback {
     }
 
     @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+    public boolean onCreateActionMode(final ActionMode mode, Menu menu) {
 
         mode.getMenuInflater().inflate(R.menu.menu_entry_selected, menu);
         this.linLay_selectedItem.setBackgroundColor(context.getResources().getColor(R.color.entry_selected));
@@ -75,7 +79,6 @@ public class ActionBarCallback_MainActivity implements ActionMode.Callback {
 
             expand(textContent, textContent.getLineHeight() * textContent.getLineCount());
         }
-
 
         entryAdapter.setActionBar(mode);
 
@@ -87,6 +90,7 @@ public class ActionBarCallback_MainActivity implements ActionMode.Callback {
             public void shakeDetected() {
 
                 deleteNote();
+                mode.finish();
             }
         });
 
@@ -146,6 +150,18 @@ public class ActionBarCallback_MainActivity implements ActionMode.Callback {
             shakeDetector.onPause();
             mode.finish();
 
+        } else if (id == R.id.MenuSelected_TextToSpeech) {
+
+            textToSpeech = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int i) {
+
+                    textToSpeech.setLanguage(Locale.GERMAN);
+                    textToSpeech.speak(note.getTitle(), TextToSpeech.QUEUE_FLUSH, null);
+                    textToSpeech.speak(note.getTextNote(), TextToSpeech.QUEUE_ADD, null);
+
+                }
+            });
         }
 
 
