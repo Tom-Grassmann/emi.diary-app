@@ -133,6 +133,18 @@
             android:layout_weight="7"
             android:id="@+id/toolBar">
 
+            <ImageButton
+                android:id="@+id/btnReadEntry"
+                android:layout_width="match_parent"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_text_to_speech"
+                style="@android:style/Widget.Holo.Light.ActionButton"
+                android:maxHeight="50dp"
+                android:scaleX="2"
+                android:scaleY="2"
+                android:layout_weight="0.1"
+                android:layout_height="60dp" />
+
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

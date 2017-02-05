@@ -1,11 +1,13 @@
 package emi.diary_app.Activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,9 +17,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.speech.tts.TextToSpeech;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +40,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import emi.diary_app.Note;
@@ -44,7 +51,9 @@ import emi.diary_app.R;
 public class EditEntryActivity extends AppCompatActivity {
 
     static final int PICK_IMAGE = 2;
-    static final int REQUEST_IMAGE_CAPTURE = 3;
+    static final int IMAGE_CAPTURE = 3;
+    final static int REQUEST_RECORD_AUDIO= 32;
+    final static int REQUEST_IMAGE_CAPTURE = 35;
 
     private EditText
             editTitle,
@@ -55,6 +64,7 @@ public class EditEntryActivity extends AppCompatActivity {
 
     private ImageButton
             btnSaveEntry,
+            btnReadEntry,
             btnAddPicture,
             btnRecordAudio,
             btnTakePicture,
@@ -72,12 +82,15 @@ public class EditEntryActivity extends AppCompatActivity {
 
     private Uri imageUri;
 
+    private TextToSpeech textToSpeech;
 
 
     private boolean RECORDING = false;
     private boolean AUDIOPLAYER_VISIBLE = false;
     private boolean AUDIO_PLAYING = false;
 
+    /* PermissionState */
+    boolean PERM_RECORD_AUDIO = true;
 
     private File audioFile = null;
 
@@ -96,6 +109,61 @@ public class EditEntryActivity extends AppCompatActivity {
     public EditEntryActivity() {
     }
 
+    private void askForPermission(int REQUEST_CODE) {
+
+        switch (REQUEST_CODE) {
+
+            case (REQUEST_RECORD_AUDIO): {
+
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
+                }
+                break;
+            }
+
+            case (REQUEST_IMAGE_CAPTURE): {
+
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_IMAGE_CAPTURE);
+                }
+                break;
+            }
+        }
+
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_RECORD_AUDIO: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+
+                    Toast.makeText(this, "Bitte erlauben sie den Zugriff auf das Mikrofon, um Audio aufnehmen zu können!", Toast.LENGTH_LONG).show();
+                }
+
+                break;
+            }
+
+            case REQUEST_IMAGE_CAPTURE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+
+                    Toast.makeText(this, "Bitte erlauben sie den Zugriff auf die Kamera, um Fotos aufnehmen zu können!", Toast.LENGTH_LONG).show();
+                }
+
+                break;
+            }
+
+
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +177,9 @@ public class EditEntryActivity extends AppCompatActivity {
         this.setContentView(R.layout.activity_edit_entry);
 
         InitializeActivity();
+
+
+
     }
 
     public void InitializeActivity() {
@@ -148,7 +219,7 @@ public class EditEntryActivity extends AppCompatActivity {
         }
 
         File internalStorage = this.getDir("Audio", Context.MODE_PRIVATE);
-        audioFile = new File(internalStorage, note.getID() + ".3gp");
+        audioFile = new File(internalStorage, note.getID() + ".3gpp");
 
 
 
@@ -172,7 +243,7 @@ public class EditEntryActivity extends AppCompatActivity {
                     String picturePath = "";
 
                     File internalStorage = getDir("Pictures", Context.MODE_PRIVATE);
-                    File reportFilePath = new File(internalStorage, note.getID() + ".png");
+                    File reportFilePath = new File(internalStorage, note.getID() + ".jpeg");
                     picturePath = reportFilePath.toString();
 
                     FileOutputStream fos = null;
@@ -252,6 +323,9 @@ public class EditEntryActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_DOWN:
                         view.setPressed(true);
 
+                        askForPermission(REQUEST_RECORD_AUDIO);
+
+
                         /* Start Audio Record */
                         try {
                             startRecord();
@@ -268,15 +342,19 @@ public class EditEntryActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_CANCEL:
                         view.setPressed(false);
 
-                        /* Stop Audio Record and Create Audio Player */
-                        try {
-                            stopRecord();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        createAudioPlayer();
+                        if (ContextCompat.checkSelfPermission(EditEntryActivity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
 
-                        /* Set up OnRecord Icon */
+                            /* Stop Audio Record and Create Audio Player */
+                            try {
+                                stopRecord();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            createAudioPlayer();
+
+                        }
+
+                        /* Reset Record Icon */
                         btnRecordAudio.setImageDrawable(getResources().getDrawable(R.drawable.ic_microfphone));
 
                         break;
@@ -296,19 +374,28 @@ public class EditEntryActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                /*if (ContextCompat.checkSelfPermission(EditEntryActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
-                    System.out.println(Integer.toString(checkSelfPermission("GPS")));
-                }
+                    askForPermission(REQUEST_IMAGE_CAPTURE);
+
+                } else {
+
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.Images.Media.TITLE, Integer.toString(note.getID()));
+                    values.put(MediaStore.Images.Media.DESCRIPTION, note.getTitle());
+                    imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                    startActivityForResult(intent, IMAGE_CAPTURE);
+                }*/
 
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Images.Media.TITLE, Integer.toString(note.getID()));
                 values.put(MediaStore.Images.Media.DESCRIPTION, note.getTitle());
-                imageUri = getContentResolver().insert(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                startActivityForResult(intent, IMAGE_CAPTURE);
 
             }
         });
@@ -397,7 +484,7 @@ public class EditEntryActivity extends AppCompatActivity {
             }
         }
 
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+        if (requestCode == IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
             try {
 
@@ -442,18 +529,20 @@ public class EditEntryActivity extends AppCompatActivity {
 
          /* - - - Set up PlayButton - - - - - - - - - - - - - - - - - - - - - - - */
         final PlayButton playVoiceContent = new PlayButton(this);
-        playVoiceContent.setBackground(this.getResources().getDrawable(R.drawable.ic_media_play));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(80, 80);
+        } else {
+            playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_play));
+        }
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, (float) 4.5);
         params.setMargins(15, 15, 0, 15);
 
         playVoiceContent.setLayoutParams(params);
+        playVoiceContent.setGravity(Gravity.CENTER_VERTICAL);
 
-        /* Add Button to Linear Layout */
         LinearLayout linearLayout = (LinearLayout) voiceEntry.findViewById(R.id.voiceEntryLinLay);
-        params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.setMargins(5, 10, 5, 10);
-        linearLayout.setLayoutParams(params);
         linearLayout.addView(playVoiceContent, 0);
         /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -489,7 +578,12 @@ public class EditEntryActivity extends AppCompatActivity {
 
                             mediaPlayer.pause();
 
-                            playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+
+                            } else {
+                                playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_play));
+                            }
 
                             AUDIO_PLAYING = false;
 
@@ -509,8 +603,12 @@ public class EditEntryActivity extends AppCompatActivity {
                             mediaPlayer.seekTo(playerSeekBar.getProgress());
 
                             /* Set up "Play" Icon */
-                            playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
 
+                            } else {
+                                playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_pause));
+                            }
                             mediaPlayer.start();
 
                              /* SeekBar updation */
@@ -554,7 +652,12 @@ public class EditEntryActivity extends AppCompatActivity {
             if (playVoiceContent.state == PlayState.PLAYING) {
 
                 /* Set up "Pause" Icon */
-                playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+
+                } else {
+                    playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_play));
+                }
 
                 /* Pause Audio */
                 mediaPlayer.pause();
@@ -565,8 +668,12 @@ public class EditEntryActivity extends AppCompatActivity {
             } else if (playVoiceContent.state == PlayState.STOPPED){
 
                 /* Set up "Play" Icon */
-                playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
 
+                } else {
+                    playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_pause));
+                }
 
                 /* - - - Preparing MediaPlayer - - - - - - - - - - - - - - - - - - - - - */
                 mediaPlayer = new MediaPlayer();
@@ -598,7 +705,12 @@ public class EditEntryActivity extends AppCompatActivity {
                         playerSeekBar.setProgress(0);
 
                         /* Set up "Pause" Icon */
-                        playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+
+                        } else {
+                            playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_play));
+                        }
 
                         /* Reset LastPlayedDuration in Note */
                         note.setLastPlayedDuration(0);
@@ -627,8 +739,12 @@ public class EditEntryActivity extends AppCompatActivity {
             } else if (playVoiceContent.state == PlayState.PAUSED) {
 
                 /* Set up "Play" Icon */
-                playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    playVoiceContent.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
 
+                } else {
+                    playVoiceContent.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_media_pause));
+                }
                 mediaPlayer.start();
 
                 /* SeekBar updation */
@@ -688,7 +804,7 @@ public class EditEntryActivity extends AppCompatActivity {
                 );
 
                 playerSeekBar.setProgress((int)startTime);
-                myHandler.postDelayed(this, 100);
+                myHandler.postDelayed(this, 5);
             }
         }
     };
@@ -698,6 +814,23 @@ public class EditEntryActivity extends AppCompatActivity {
         btnSaveEntry = (ImageButton) findViewById(R.id.btnSaveEntry);
         btnRecordAudio = (ImageButton) findViewById(R.id.btnRecordAudio);
         btnTakePicture = (ImageButton) findViewById(R.id.btnTakePicture);
+
+        btnReadEntry = (ImageButton) findViewById(R.id.btnReadEntry);
+        btnReadEntry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                textToSpeech = new TextToSpeech(EditEntryActivity.this, new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(int i) {
+
+                        textToSpeech.setLanguage(Locale.GERMAN);
+                        textToSpeech.speak(editTitle.getText().toString(), TextToSpeech.QUEUE_FLUSH, null);
+                        textToSpeech.speak(editTextContent.getText().toString(), TextToSpeech.QUEUE_ADD, null);
+                    }
+                });
+            }
+        });
 
         btnDeleteText = (ImageButton) findViewById(R.id.btnDeleteText);
         btnDeletePicture = (ImageButton) findViewById(R.id.btnDeletePicture);

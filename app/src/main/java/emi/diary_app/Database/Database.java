@@ -130,7 +130,7 @@ public class Database extends SQLiteOpenHelper implements Serializable{
 
         /* Remove image from internalStorage */
         File internalStorage = appContext.getDir("Pictures", Context.MODE_PRIVATE);
-        File FilePath = new File(internalStorage, note.getID() + ".png");
+        File FilePath = new File(internalStorage, note.getID() + ".jpeg");
         String picturePath = FilePath.toString();
 
         if (picturePath != null && picturePath.length() != 0) {

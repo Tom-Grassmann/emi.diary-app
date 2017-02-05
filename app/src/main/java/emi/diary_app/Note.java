@@ -30,6 +30,8 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
 
     protected int playerDuration = 0;
 
+    protected boolean isSelected = false;
+
 
     public Note(int ID, String title) {
 
@@ -151,12 +153,12 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
             }
         }
 
-        Calendar calendar = Calendar.getInstance(Locale.GERMAN);
+        Calendar calendar = Calendar.getInstance(Locale.GERMANY);
         calendar.setTimeInMillis(this.timestamp);
         DateFormat dateFormat = new DateFormat();
 
 
-        return dateFormat.format("hh:mm:ss, dd.MM.yyyy", calendar).toString() + " " + location;
+        return dateFormat.format("HH:mm:ss, dd.MM.yyyy", calendar).toString() + " " + location;
     }
 
 
@@ -215,5 +217,13 @@ public class Note implements Comparator<Note>, Comparable<Note>, Serializable {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }

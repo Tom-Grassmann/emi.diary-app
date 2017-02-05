@@ -126,7 +126,7 @@ public class LocalisationThread extends Thread {
                     strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
                 }
 
-                return returnedAddress.getLocality();
+                return returnedAddress.getLocality() + " (" + returnedAddress.getCountryName() + ")";
             }
             else{
                 return "";
